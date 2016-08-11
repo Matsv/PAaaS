@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-public class BurgercompareApplication {
+public class PAaaSApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BurgercompareApplication.class, args);
+        SpringApplication.run(PAaaSApplication.class, args);
     }
 }

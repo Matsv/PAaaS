@@ -12,7 +12,5 @@ import java.util.List;
 public class MinecraftData {
     private MinecraftLatest minecraftLatest;
     private List<MinecraftVersion> versions;
-
-
 }
 
