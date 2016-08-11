@@ -20,10 +20,8 @@ public class MinecraftTask {
         System.out.println(gson.fromJson(s, MinecraftData.class));
     }
 
-    @Scheduled(fixedDelay = 1000 * 60 * 10) // Run every 10 minutes?
+    @Scheduled(initialDelay = 0, fixedDelay = 1000 * 60 * 1) // Run every minute
     public void versionTask() throws Exception {
         checkVersions();
     }
-
-
 }
