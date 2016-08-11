@@ -1,6 +1,6 @@
 package nl.matsv.paaaas.controllers;
 
-import nl.matsv.paaaas.data.MinecraftVersion;
+import nl.matsv.paaaas.data.minecraft.MinecraftVersion;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

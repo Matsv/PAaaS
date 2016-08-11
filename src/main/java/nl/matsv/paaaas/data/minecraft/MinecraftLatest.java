@@ -1,4 +1,4 @@
-package nl.matsv.paaaas.data;
+package nl.matsv.paaaas.data.minecraft;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

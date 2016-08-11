@@ -1,7 +1,7 @@
 package nl.matsv.paaaas.tasks;
 
 import com.google.gson.Gson;
-import nl.matsv.paaaas.data.MinecraftData;
+import nl.matsv.paaaas.data.minecraft.MinecraftData;
 import org.apache.commons.io.IOUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
