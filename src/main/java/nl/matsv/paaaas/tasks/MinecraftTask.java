@@ -1,8 +1,11 @@
 package nl.matsv.paaaas.tasks;
 
 import com.google.gson.Gson;
+import nl.matsv.paaaas.DataProvider;
+import nl.matsv.paaaas.data.PAaaSData;
 import nl.matsv.paaaas.data.minecraft.MinecraftData;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,6 +16,12 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class MinecraftTask {
     private final Gson gson = new Gson();
+    private final DataProvider dataProvider;
+
+    @Autowired
+    public MinecraftTask(DataProvider dataProvider) {
+        this.dataProvider = dataProvider;
+    }
 
     @Async
     public void checkVersions() throws Exception {
