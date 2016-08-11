@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>burgercompare</name>
+    <name>PAaaS</name>
     <description>Spring integration of my prototype project 'Burger Compare'</description>
 
     <parent>
