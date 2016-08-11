@@ -1,10 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
-    <title>Hello</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>PAaaS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+    <!--Bootstrap-->
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!--Bootstrap select-->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+
+    <link href="css/style.css" rel="stylesheet"/>
+    <script type="text/javascript" src="js/magic.js"></script>
 </head>
 <body>
-    <p>HI :)</p>
+
+<div class="modal fade" role="dialog" aria-labelledby="beginModalLabel" data-target="#beginModal" id="beginModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span class="pull-right" id="status">Loading...</span>
+                    <span id="sitename"><h4>PAaaS</h4></span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="alert alert-danger" id="overlayerror" role="alert" style="display: none">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    <span id="errortext"></span>
+                </div>
+                <p class="text-center"><i>Version numbers are cached for 10 minutes</i></p>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="versionpicker" style="text-align: center;">
+                            <h4>Old version</h4>
+                            <select class="selectpicker" id="old" data-style="btn-danger" data-live-search="true">
+                                <option value="loading">Loading...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="versionpicker" style="text-align: center">
+                            <h4>New version</h4>
+                            <select class="selectpicker" data-style="btn-success" id="new" data-live-search="true">
+                                <option value="loading">Loading...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col" style="text-align: center;border-top: 1px solid #eee; margin-top: 1em;">
+                        <p></p>
+                        <button class="btn btn-primary" id="compare" value="compare">Compare versions</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">Made with ❤ by <strong>Matsv</strong> and <strong>Myles</strong>. Based of <a
+                    href="https://github.com/mcdevs/Burger">Burger</a>, Inspired from <a
+                    href="https://github.com/sadimusi/BurgerVitrine/">Burger Vitrine</a></div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
