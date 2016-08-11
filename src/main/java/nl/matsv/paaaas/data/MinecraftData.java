@@ -10,9 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MinecraftData {
-    private MinecraftLatest minecraftLatest;
+    private MinecraftLatest latest;
     private List<MinecraftVersion> versions;
-
-
 }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>PAaaS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -43,7 +43,10 @@
                         <div class="versionpicker" style="text-align: center;">
                             <h4>Old version</h4>
                             <select class="selectpicker" id="old" data-style="btn-danger" data-live-search="true">
-                                <option value="loading">Loading...</option>
+                                <option th:each="ver : ${versions}"
+                                        th:value="${ver.id}"
+                                        th:text="${ver.type + ': ' + ver.id}">
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -51,7 +54,10 @@
                         <div class="versionpicker" style="text-align: center">
                             <h4>New version</h4>
                             <select class="selectpicker" data-style="btn-success" id="new" data-live-search="true">
-                                <option value="loading">Loading...</option>
+                                <option th:each="ver : ${versions}"
+                                        th:value="${ver.id}"
+                                        th:text="${ver.type + ': ' + ver.id}">
+                                </option>
                             </select>
                         </div>
                     </div>

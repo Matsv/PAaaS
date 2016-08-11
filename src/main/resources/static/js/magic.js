@@ -42,7 +42,7 @@ var web = {
 
 $(document).ready(function () {
     $("#compare").prop("disabled", true);
-    $('.selectpicker').prop('disabled', true);
+    // $('.selectpicker').prop('disabled', true);
 
     jQuery('#beginModal').modal('show').on('hide.bs.modal', function (e) {
         if (web.isHidden)
