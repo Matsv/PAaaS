@@ -4,7 +4,7 @@ import lombok.Data;
 
 //TODO
 @Data
-public class PAaaSData {
+public class VersionDataFile {
     // Burger data
     // Metadata
 }
