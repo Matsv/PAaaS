@@ -1,8 +1,10 @@
 package nl.matsv.paaaas.tasks;
 
 import com.google.gson.Gson;
+import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.minecraft.MinecraftData;
 import nl.matsv.paaaas.data.minecraft.MinecraftVersion;
+import nl.matsv.paaaas.module.ModuleLoader;
 import nl.matsv.paaaas.storage.StorageManager;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,12 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class MinecraftTask {
-    private final Gson gson = new Gson();
+    @Autowired
+    private Gson gson;
     @Autowired
     private StorageManager storageManager;
+    @Autowired
+    private ModuleLoader moduleLoader;
 
     @Async
     public void checkVersions() throws Exception {
@@ -25,10 +30,12 @@ public class MinecraftTask {
         MinecraftData mcData = gson.fromJson(json, MinecraftData.class);
 
         for (MinecraftVersion version : mcData.getVersions()) {
-            if(!storageManager.hasVersion(version.getId())){
-                // Download Jar
+            if (!storageManager.hasVersion(version.getId())) {
+                VersionDataFile vdf = new VersionDataFile(version);
                 // Run Modules
+                moduleLoader.runModules(vdf);
                 // Save Data File!
+                storageManager.saveVersion(vdf);
             }
         }
     }
