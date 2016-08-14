@@ -10,10 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -74,12 +71,20 @@ public class StorageManager {
 
     public List<MinecraftVersion> getEnabledVersions() {
         List<MinecraftVersion> versions = new ArrayList<>();
+
+        // Collect enabled versions
         for (String version : getVersions()) {
             Optional<VersionDataFile> vdf = getVersion(version);
-            if (vdf.isPresent() && vdf.get().getMetadata().isEnabled()) {
-                    versions.add(vdf.get().getVersion());
-            }
+            if (vdf.isPresent() && vdf.get().getMetadata().isEnabled())
+                versions.add(vdf.get().getVersion());
         }
+
+        // Sort on release time
+        Collections.sort(versions, (o1, o2) -> {
+            if (o1.getReleaseTime() == null || o2.getReleaseTime() == null)
+                return 0;
+            return o2.getReleaseTime().compareTo(o1.getReleaseTime());
+        });
         return versions;
     }
 }
