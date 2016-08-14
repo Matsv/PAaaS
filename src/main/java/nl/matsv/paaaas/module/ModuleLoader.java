@@ -3,6 +3,7 @@ package nl.matsv.paaaas.module;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.modules.BurgerModule;
 import nl.matsv.paaaas.module.modules.JarModule;
+import nl.matsv.paaaas.module.modules.metadata.MetadataModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
@@ -16,6 +17,7 @@ public class ModuleLoader {
         // Add module
         modules.add(JarModule.class);
         modules.add(BurgerModule.class);
+        modules.add(MetadataModule.class);
     }
 
     @Autowired
