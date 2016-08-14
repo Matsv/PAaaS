@@ -18,11 +18,11 @@ import java.util.stream.Collectors;
 
 @Getter
 public class StorageManager {
-    @Autowired
-    private Gson gson;
     private final File jarDirectory;
     private final File dataDirectory;
     private final File burgerDirectory;
+    @Autowired
+    private Gson gson;
 
     public StorageManager() {
         jarDirectory = new File("jars/");
@@ -72,12 +72,12 @@ public class StorageManager {
                 .collect(Collectors.toList());
     }
 
-    public List<MinecraftVersion> getMinecraftVersions() {
+    public List<MinecraftVersion> getEnabledVersions() {
         List<MinecraftVersion> versions = new ArrayList<>();
         for (String version : getVersions()) {
             Optional<VersionDataFile> vdf = getVersion(version);
-            if (vdf.isPresent()) {
-                versions.add(vdf.get().getVersion());
+            if (vdf.isPresent() && vdf.get().getMetadata().isEnabled()) {
+                    versions.add(vdf.get().getVersion());
             }
         }
         return versions;

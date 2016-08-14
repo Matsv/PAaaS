@@ -13,7 +13,7 @@ public class DefaultController {
 
     @RequestMapping("/")
     public String index(Model model) {
-        model.addAttribute("versions", storageManager.getMinecraftVersions());
+        model.addAttribute("versions", storageManager.getEnabledVersions());
         return "index";
     }
 }
