@@ -4,9 +4,9 @@
 temp/
 
 ### PAaaS generated maps
-data/
-jars/
-Burger/
+/data/
+/jars/
+/Burger/
 
 ### Maven template
 target/
