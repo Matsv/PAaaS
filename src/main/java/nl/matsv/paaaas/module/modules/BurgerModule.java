@@ -3,12 +3,11 @@ package nl.matsv.paaaas.module.modules;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.VersionMeta;
 import nl.matsv.paaaas.module.Module;
-import nl.matsv.paaaas.storage.StorageManager;
 import nl.matsv.paaaas.services.BurgerService;
+import nl.matsv.paaaas.storage.StorageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.IOException;
 
 public class BurgerModule extends Module {
     @Autowired

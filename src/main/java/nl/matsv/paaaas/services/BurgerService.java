@@ -19,14 +19,15 @@ import java.util.Map;
 
 @Service
 public class BurgerService {
-    private final String BURGER_URL = "https://github.com/mcdevs/Burger";
+    private final String BURGER_URL = "https://github.com/mcdevs/Burger.git";
     @Autowired
     private StorageManager storageManager;
     @Autowired
     private Gson gson;
 
     public void cloneBurger() throws IOException, InterruptedException {
-        Process process = Runtime.getRuntime().exec("git clone " + BURGER_URL, new String[0]);
+        //  --config http.sslverify=false
+        Process process = Runtime.getRuntime().exec("git clone " + BURGER_URL + "", new String[0]);
 
         int exitCode = process.waitFor();
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
