@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @Data
-@RequiredArgsConstructor
 public class BurgerPacket {
     @SerializedName("class")
     private String claz;
     private String direction;
+    private String state;
     private boolean from_client;
     private boolean from_server;
     private int id;

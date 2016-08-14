@@ -22,6 +22,7 @@ public class StorageManager {
     private Gson gson;
     private final File jarDirectory;
     private final File dataDirectory;
+    private final File burgerDirectory;
 
     public StorageManager() {
         jarDirectory = new File("jars/");
@@ -33,6 +34,8 @@ public class StorageManager {
         if (!dataDirectory.exists()) {
             dataDirectory.mkdir();
         }
+
+        burgerDirectory = new File("Burger/");
     }
 
     public Optional<VersionDataFile> getVersion(String version) {

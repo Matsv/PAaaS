@@ -1,6 +1,7 @@
 package nl.matsv.paaaas;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import nl.matsv.paaaas.module.ModuleLoader;
 import nl.matsv.paaaas.storage.StorageManager;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,6 @@ public class AppConfig {
 
     @Bean
     public Gson gson() {
-        return new Gson();
+        return new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
     }
 }

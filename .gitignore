@@ -2,8 +2,11 @@
 
 ### My useless maps
 temp/
+
+### PAaaS generated maps
 data/
 jars/
+Burger/
 
 ### Maven template
 target/
