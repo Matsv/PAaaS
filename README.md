@@ -1,6 +1,6 @@
 PAaaS
 ===================
-Protocol Analysis as a Service
+Minecraft Protocol Analysis as a Service
 
 The idea of PAaaS is to provide a service which can on the fly compare the differences in protocols between 2 versions. This includes regular updating to ensure it has the newest data.
 
