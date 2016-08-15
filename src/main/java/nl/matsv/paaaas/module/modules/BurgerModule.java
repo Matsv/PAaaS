@@ -33,6 +33,11 @@ public class BurgerModule extends Module {
             return;
         }
 
+        if (!burgerService.hasMainFile()){
+            System.out.println("Cannot start Burger because the munch.py file doesn't exists ");
+            return;
+        }
+
         try {
             boolean success = burgerService.runBurger(jar, versionDataFile);
             if (success)

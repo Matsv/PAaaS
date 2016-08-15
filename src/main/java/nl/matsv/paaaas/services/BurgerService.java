@@ -28,12 +28,14 @@ public class BurgerService {
     private Gson gson;
 
     public void cloneBurger() throws GitAPIException {
-        System.out.println("Starting to clone burger");
+        System.out.println("Starting to clone Burger");
         Git.cloneRepository()
                 .setURI(BURGER_URL)
                 .setDirectory(new File("Burger/"))
                 .call();
-        System.out.println("Finished to clone burger");
+        System.out.println("Finished cloning Burger");
+
+        setup();
     }
 
     @PostConstruct
