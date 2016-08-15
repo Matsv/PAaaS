@@ -2,7 +2,6 @@ package nl.matsv.paaaas.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.burger.BurgerOutput;
@@ -14,45 +13,58 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Map;
 
 @Service
 public class BurgerService {
     private final String BURGER_URL = "https://github.com/mcdevs/Burger.git";
-    @Autowired
-    private StorageManager storageManager;
+    private final String JAWA_URL = "https://github.com/TkTech/Jawa.git";
+    private File BURGER_DIR = new File("Burger1/");
+    private File JAWA_DIR = new File("Jawa/");
+
     @Autowired
     private Gson gson;
-
-    public void cloneBurger() throws GitAPIException {
-        System.out.println("Starting to clone Burger");
-        Git.cloneRepository()
-                .setURI(BURGER_URL)
-                .setDirectory(new File("Burger/"))
-                .call();
-        System.out.println("Finished cloning Burger");
-
-        setup();
-    }
+    @Autowired
+    private JythonService jythonService;
 
     @PostConstruct
     public void checkForUpdate() throws GitAPIException, IOException {
-        if (hasMainFile())
-            Git.open(new File("Burger/")).pull().call();
-        else
-            cloneBurger();
-    }
+        if (!BURGER_DIR.isDirectory())
+            BURGER_DIR.mkdir();
+        if (!JAWA_DIR.isDirectory())
+            JAWA_DIR.mkdir();
 
-    private void setup() {
-        System.out.println("Running setup.py for Burger");
-        // TODO run python setup.py install. with the default python package, this has to be executed as root.
+        if (hasMainFile()) {
+            Git.open(BURGER_DIR).pull().call();
+        } else {
+            System.out.println("Starting to clone Burger");
+            Git.cloneRepository()
+                    .setURI(BURGER_URL)
+                    .setDirectory(BURGER_DIR)
+                    .call();
+            System.out.println("Finished cloning Burger");
+        }
+        if (hasJawaMainFile()) {
+            Git.open(JAWA_DIR).pull().call();
+        } else {
+            System.out.println("Starting to clone Jawa");
+            Git.cloneRepository()
+                    .setURI(JAWA_URL)
+                    .setDirectory(JAWA_DIR)
+                    .call();
+            System.out.println("Finished cloning Jawa");
+        }
     }
 
     public boolean hasMainFile() {
-        return new File(storageManager.getBurgerDirectory(), "munch.py").exists();
+        return new File(BURGER_DIR, "munch.py").exists();
+    }
+
+    public boolean hasJawaMainFile() {
+        return new File(JAWA_DIR, "setup.py").exists();
     }
 
     private boolean removeTempFile() {
@@ -61,47 +73,31 @@ public class BurgerService {
     }
 
     private File getTempFile() {
-        return new File(storageManager.getBurgerDirectory(), "temp.json");
+        return new File(BURGER_DIR, "temp.json");
     }
 
     public boolean runBurger(File file, VersionDataFile versionDataFile) throws InterruptedException, IOException {
         removeTempFile();
         System.out.println("Start Burger for version " + versionDataFile.getVersion().getId());
+        Throwable error = jythonService.execute(new File(BURGER_DIR, "munch.py"), new String[]{"--toppings", "packets,version,packetinstructions", "--output", new File(BURGER_DIR, "temp.json").getAbsolutePath(), file.getAbsolutePath()}, new File[]{JAWA_DIR});
+        if (error != null) {
+            System.out.println("Failed to run Burger...");
+            error.printStackTrace();
+            return false;
+        } else {
+            FileReader fileWriter = new FileReader(getTempFile());
+            JsonArray array = (JsonArray) new JsonParser().parse(fileWriter);
+            BurgerOutput output = gson.fromJson(array.get(0).getAsJsonObject(), BurgerOutput.class);
 
-        Process process = Runtime.getRuntime().exec(String.format("python munch.py --toppings packets,version,packetinstructions --output temp.json %s", file.getAbsolutePath()), new String[0], storageManager.getBurgerDirectory());
-
-        int exitCode = process.waitFor();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String line;
-        try {
-            if (exitCode != 0) {
-                System.out.println("Something went wrong while trying to run Burger for version " + versionDataFile.getVersion().getId() + " exitCode: " + exitCode);
-
-                List<String> errors = new ArrayList<>();
-                while ((line = reader.readLine()) != null)
-                    errors.add(line);
-
-                versionDataFile.getMetadata().setEnabled(false);
-                versionDataFile.getMetadata().addErrors(errors.toArray(new String[0]));
-
-                return false;
-            } else {
-                FileReader fileWriter = new FileReader(getTempFile());
-                JsonArray array = (JsonArray) new JsonParser().parse(fileWriter);
-                BurgerOutput output = gson.fromJson(array.get(0).getAsJsonObject(), BurgerOutput.class);
-
-                // Add states
-                for (Map.Entry<String, BurgerPacket> entry : output.getPackets().getPacket().entrySet()) {
-                    String state = entry.getKey().split("_")[0]; // get state from string until Burger adds it
-                    entry.getValue().setState(state);
-                }
-
-                versionDataFile.setBurgerData(output);
-                versionDataFile.getMetadata().setBurger(true);
-                return true;
+            // Add states
+            for (Map.Entry<String, BurgerPacket> entry : output.getPackets().getPacket().entrySet()) {
+                String state = entry.getKey().split("_")[0]; // get state from string until Burger adds it
+                entry.getValue().setState(state);
             }
-        } finally {
-            reader.close();
+
+            versionDataFile.setBurgerData(output);
+            versionDataFile.getMetadata().setBurger(true);
+            return true;
         }
     }
 }

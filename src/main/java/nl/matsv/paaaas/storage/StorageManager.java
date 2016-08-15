@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 public class StorageManager {
     private final File jarDirectory;
     private final File dataDirectory;
-    private final File burgerDirectory;
     @Autowired
     private Gson gson;
 
@@ -31,8 +30,6 @@ public class StorageManager {
         if (!dataDirectory.exists()) {
             dataDirectory.mkdir();
         }
-
-        burgerDirectory = new File("Burger/");
     }
 
     public Optional<VersionDataFile> getVersion(String version) {
