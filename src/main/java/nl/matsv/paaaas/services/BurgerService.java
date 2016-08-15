@@ -8,6 +8,8 @@ import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.burger.BurgerOutput;
 import nl.matsv.paaaas.data.burger.BurgerPacket;
 import nl.matsv.paaaas.storage.StorageManager;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,31 +27,19 @@ public class BurgerService {
     @Autowired
     private Gson gson;
 
-    public void cloneBurger() throws IOException, InterruptedException {
-        //  --config http.sslverify=false
-        Process process = Runtime.getRuntime().exec("git clone " + BURGER_URL + "", new String[0]);
-
-        int exitCode = process.waitFor();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String line;
-        try {
-            if (exitCode != 0) {
-                System.out.println("Something went wrong while trying to clone Burger exitCode: " + exitCode);
-                while ((line = reader.readLine()) != null)
-                    System.out.println(line);
-            } else {
-                System.out.println("Burger cloned successfully");
-                setup();
-            }
-        } finally {
-            reader.close();
-        }
+    public void cloneBurger() throws GitAPIException {
+        System.out.println("Starting to clone burger");
+        Git.cloneRepository()
+                .setURI(BURGER_URL)
+                .setDirectory(new File("Burger/"))
+                .call();
+        System.out.println("Finished to clone burger");
     }
 
     @PostConstruct
-    public void checkForUpdate() throws IOException, InterruptedException {
+    public void checkForUpdate() throws GitAPIException, IOException {
         if (hasMainFile())
-            Runtime.getRuntime().exec("git pull origin master", new String[0], storageManager.getBurgerDirectory()); // TODO gotta catch the errors
+            Git.open(new File("Burger/")).pull().call();
         else
             cloneBurger();
     }
