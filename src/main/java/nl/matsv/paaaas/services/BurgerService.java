@@ -22,7 +22,7 @@ import java.util.Map;
 public class BurgerService {
     private final String BURGER_URL = "https://github.com/mcdevs/Burger.git";
     private final String JAWA_URL = "https://github.com/TkTech/Jawa.git";
-    private File BURGER_DIR = new File("Burger1/");
+    private File BURGER_DIR = new File("Burger/");
     private File JAWA_DIR = new File("Jawa/");
 
     @Autowired
