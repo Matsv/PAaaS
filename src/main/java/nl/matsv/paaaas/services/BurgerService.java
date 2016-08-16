@@ -15,8 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.burger.BurgerOutput;
-import nl.matsv.paaaas.data.burger.BurgerPacket;
-import nl.matsv.paaaas.storage.StorageManager;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
 
 @Service
 public class BurgerService {
@@ -79,7 +77,15 @@ public class BurgerService {
 
     private boolean removeTempFile() {
         File f = getTempFile();
-        return f.exists() && f.delete();
+        if(f.exists()){
+            try {
+                FileUtils.forceDelete(f);
+            } catch (IOException e) {
+                f.deleteOnExit();
+                System.out.println("Scheduling " + f.getAbsolutePath() + " to be deleted on exit.");
+            }
+        }
+        return false;
     }
 
     private File getTempFile() {
@@ -89,10 +95,11 @@ public class BurgerService {
     public boolean runBurger(File file, VersionDataFile versionDataFile) throws InterruptedException, IOException {
         removeTempFile();
         System.out.println("Start Burger for version " + versionDataFile.getVersion().getId());
-        Throwable error = jythonService.execute(new File(BURGER_DIR, "munch.py"), new String[]{"--toppings", "packets,version,packetinstructions", "--output", new File(BURGER_DIR, "temp.json").getAbsolutePath(), file.getAbsolutePath()}, new File[]{JAWA_DIR});
+        Throwable error = jythonService.execute(new File(BURGER_DIR, "munch.py"), new String[]{"--toppings", "packets,version,packetinstructions", "--output", getTempFile().getAbsolutePath(), file.getAbsolutePath()}, new File[]{JAWA_DIR});
         if (error != null) {
             System.out.println("Failed to run Burger...");
             error.printStackTrace();
+            removeTempFile();
             return false;
         } else {
             FileReader fileWriter = new FileReader(getTempFile());
@@ -101,6 +108,8 @@ public class BurgerService {
 
             versionDataFile.setBurgerData(output);
             versionDataFile.getMetadata().setBurger(true);
+            fileWriter.close();
+            removeTempFile();
             return true;
         }
     }

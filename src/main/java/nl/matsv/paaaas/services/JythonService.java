@@ -11,10 +11,13 @@
 package nl.matsv.paaaas.services;
 
 import org.python.core.*;
+import org.python.core.finalization.FinalizeTrigger;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 
 @Service
 public class JythonService {
@@ -42,23 +45,14 @@ public class JythonService {
         // Fix a few variables
         interpreter.set("__file__", new PyString(pythonScript.getAbsolutePath()));
         interpreter.set("__name__", new PyString("__main__"));
+        interpreter.set("track", new PyObject());
         // Run & Wait!
-        Throwable[] exception = new Throwable[1];
+        Throwable exception = null;
         try {
-            Thread t = new Thread() {
-                public void run() {
-                    try {
-                        interpreter.execfile(pythonScript.getAbsolutePath());
-                    } catch (Exception e) {
-                        exception[0] = e;
-                    }
-                }
-            };
-            t.start();
-            t.join();
-        } catch (InterruptedException e) {
-            exception[0] = e;
+            interpreter.execfile(pythonScript.getAbsolutePath());
+        } catch (Exception e) {
+            exception = e;
         }
-        return exception[0];
+        return exception;
     }
 }
