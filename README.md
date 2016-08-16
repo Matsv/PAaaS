@@ -10,9 +10,11 @@ The idea of PAaaS is to provide a service which can on the fly compare the diffe
 Running
 -------------
 
-Requirements: Java, Python 2.7, Git
+Requirements: Java
 (Should be compatible with all OS)
 
-Execute for the first time, then run `cd Burger && python setup.py install`.
-
 We use maven.
+
+License
+-------
+This project uses the MIT license, see [LICENSE.md](https://github.com/Matsv/PAaaS/blob/master/LICENSE.md) for more information.
