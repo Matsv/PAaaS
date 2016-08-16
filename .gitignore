@@ -30,6 +30,7 @@ buildNumber.properties
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
 .idea/*
+.idea/
 *.iml
 
 # Sensitive or high-churn files:
