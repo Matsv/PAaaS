@@ -102,13 +102,13 @@ public class BurgerService {
             removeTempFile();
             return false;
         } else {
-            FileReader fileWriter = new FileReader(getTempFile());
-            JsonArray array = (JsonArray) new JsonParser().parse(fileWriter);
+            FileReader fileReader = new FileReader(getTempFile());
+            JsonArray array = (JsonArray) new JsonParser().parse(fileReader);
             BurgerOutput output = gson.fromJson(array.get(0).getAsJsonObject(), BurgerOutput.class);
 
             versionDataFile.setBurgerData(output);
             versionDataFile.getMetadata().setBurger(true);
-            fileWriter.close();
+            fileReader.close();
             removeTempFile();
             return true;
         }
