@@ -89,12 +89,6 @@ public class BurgerService {
             JsonArray array = (JsonArray) new JsonParser().parse(fileWriter);
             BurgerOutput output = gson.fromJson(array.get(0).getAsJsonObject(), BurgerOutput.class);
 
-            // Add states
-            for (Map.Entry<String, BurgerPacket> entry : output.getPackets().getPacket().entrySet()) {
-                String state = entry.getKey().split("_")[0]; // get state from string until Burger adds it
-                entry.getValue().setState(state);
-            }
-
             versionDataFile.setBurgerData(output);
             versionDataFile.getMetadata().setBurger(true);
             return true;
