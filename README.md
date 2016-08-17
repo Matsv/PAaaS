@@ -9,11 +9,23 @@ The idea of PAaaS is to provide a service which can on the fly compare the diffe
 
 Running
 -------------
+**Requirements:** Java
 
-Requirements: Java
-(Should be compatible with all OS)
+Use `git clone` and then `mvn install` to make a runnable jar. Otherwise download a copy from our build server.
 
-We use maven.
+Build Server: https://ci.viaversion.com/view/All/job/PAaaS/
+
+After executing you will be able to access the tool at http://localhost:8080.
+
+The tool initially make take some time to boot, it runs various git commands to get the required tools to run.
+
+Tools we use in our PAaaS
+-------
+Burger - https://github.com/mcdevs/Burger/
+
+Jawa - https://github.com/TkTech/Jawa
+
+
 
 License
 -------
