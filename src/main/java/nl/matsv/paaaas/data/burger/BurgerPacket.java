@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@Data
 public class BurgerPacket {
     @SerializedName("class")
     private String claz;
