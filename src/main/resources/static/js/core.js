@@ -104,13 +104,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code\"><div id='old'></div></div>"
+                + "           <div class=\"panel-footer code oldMeta\"><div id='tree'></div></div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code\"><div id='new'></div></div>"
+                + "           <div class=\"panel-footer code newMeta\"><div id='tree'></div></div>"
                 + "       </div>"
                 + "    </div>");
         web.generateTree(oldV, newV);
@@ -122,8 +122,8 @@ var web = {
         web.convertTree(oldTree);
         web.convertTree(newTree);
         console.info([newTree]);
-        $('#old').treeview({data: [oldTree]});
-        $('#new').treeview({data: [newTree]});
+        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))]}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
+        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))]});
     },
     convertMeta: function (meta) {
         meta.text = meta.index + ": " + meta.type;
