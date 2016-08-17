@@ -16,6 +16,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="js/HashMap.js"></script>
+    <script src="js/PacketParser.js"></script>
 
     <!--Bootstrap-->
     <link href="css/bootstrap.min.css" rel="stylesheet"/>
@@ -27,64 +29,67 @@
 
 
     <link href="css/style.css" rel="stylesheet"/>
-    <script type="text/javascript" src="js/magic.js"></script>
+    <script type="text/javascript" src="js/core.js"></script>
 </head>
 <body>
 
-
-<nav class="navbar navbar-inverse navbar-static-top">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#">PAaaS</a>
+            <a class="navbar-brand" href="#">PAaaS ALPHA</a>
         </div>
     </div>
 </nav>
-<div class="modal fade" role="dialog" aria-labelledby="beginModalLabel" data-target="#beginModal" id="beginModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="pull-right"></span> <!-- TODO: Maybe links to github etc? -->
-                    <span id="sitename"><h4>PAaaS</h4></span>
-                </div>
-            </div>
 
-            <div class="modal-body">
-                <p class="text-center"><i>Version numbers are cached for 1 minute</i></p>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="versionpicker" style="text-align: center;">
-                            <h4>Old version</h4>
-                            <select class="selectpicker" id="old" data-style="btn-danger" data-live-search="true">
-                                <option th:each="ver : ${versions}"
-                                        th:value="${ver.id}"
-                                        th:text="${ver.type + ': ' + ver.id}">
-                                </option>
-                            </select>
+<div class="container-fluid" id="data">
+
+    <div class="modal fade" role="dialog" aria-labelledby="beginModalLabel" data-target="#beginModal" id="beginModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <span class="pull-right"></span> <!-- TODO: Maybe links to github etc? -->
+                        <span id="sitename"><h4>PAaaS ALPHA</h4></span>
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <p class="text-center"><i>Version numbers are cached for 1 minute</i></p>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="versionpicker" style="text-align: center;">
+                                <h4>Old version</h4>
+                                <select class="selectpicker" id="old" data-style="btn-danger" data-live-search="true">
+                                    <option th:each="ver : ${versions}"
+                                            th:value="${ver.id}"
+                                            th:text="${ver.type + ': ' + ver.id}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="versionpicker" style="text-align: center">
+                                <h4>New version</h4>
+                                <select class="selectpicker" data-style="btn-success" id="new" data-live-search="true">
+                                    <option th:each="ver : ${versions}"
+                                            th:value="${ver.id}"
+                                            th:text="${ver.type + ': ' + ver.id}">
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="versionpicker" style="text-align: center">
-                            <h4>New version</h4>
-                            <select class="selectpicker" data-style="btn-success" id="new" data-live-search="true">
-                                <option th:each="ver : ${versions}"
-                                        th:value="${ver.id}"
-                                        th:text="${ver.type + ': ' + ver.id}">
-                                </option>
-                            </select>
+                    <div class="row">
+                        <div class="col" style="text-align: center;border-top: 1px solid #eee; margin-top: 1em;">
+                            <p></p>
+                            <button class="btn btn-primary" id="compare" value="compare">Compare versions</button>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col" style="text-align: center;border-top: 1px solid #eee; margin-top: 1em;">
-                        <p></p>
-                        <button class="btn btn-primary" id="compare" value="compare">Compare versions</button>
-                    </div>
-                </div>
+                <div class="modal-footer">Made with ❤ bij <strong>Matsv</strong> and <strong>Myles</strong>. Based of <a
+                        href="https://github.com/mcdevs/Burger">Burger</a>, Inspired from <a
+                        href="https://github.com/sadimusi/BurgerVitrine/">Burger Vitrine</a></div>
             </div>
-            <div class="modal-footer">Made with ❤ by <strong>Matsv</strong> and <strong>Myles</strong>. Based of <a
-                    href="https://github.com/mcdevs/Burger">Burger</a>, Inspired from <a
-                    href="https://github.com/sadimusi/BurgerVitrine/">Burger Vitrine</a></div>
         </div>
     </div>
 </div>

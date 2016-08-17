@@ -10,6 +10,8 @@
 
 package nl.matsv.paaaas.module;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.modules.BurgerModule;
 import nl.matsv.paaaas.module.modules.JarModule;
@@ -19,9 +21,12 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ModuleLoader {
     private static List<Class<? extends Module>> modules = new ArrayList<>();
+    @Autowired
+    private Gson gson;
 
     static {
         // Add module
@@ -47,5 +52,26 @@ public class ModuleLoader {
         for (Class<? extends Module> module : modules) {
             initModule(module).run(vdf);
         }
+    }
+
+    public JsonObject compareModules(VersionDataFile oldV, VersionDataFile newV){
+        JsonObject obj = new JsonObject();
+
+        obj.add("oldVersion", new JsonObject());
+        obj.add("newVersion", new JsonObject());
+
+        JsonObject oldObject = obj.get("oldVersion").getAsJsonObject();
+        JsonObject newObject = obj.get("newVersion").getAsJsonObject();
+
+        for (Class<? extends Module> module : modules) {
+            Optional<JsonObject> oldOutput = initModule(module).compare(oldV, newV);
+            Optional<JsonObject> newOutput = initModule(module).compare(newV, oldV);
+
+            if (oldOutput.isPresent() && newOutput.isPresent()) {
+                oldObject.add(module.getSimpleName(), oldOutput.get());
+                newObject.add(module.getSimpleName(), newOutput.get());
+            }
+        }
+        return obj;
     }
 }

@@ -12,6 +12,7 @@ package nl.matsv.paaaas.module.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.Module;
 import nl.matsv.paaaas.storage.StorageManager;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class JarModule extends Module {
     @Autowired
@@ -54,5 +56,10 @@ public class JarModule extends Module {
             e.printStackTrace();
         }
         System.out.println("Finished downloading " + versionDataFile.getVersion().getId());
+    }
+
+    @Override
+    public Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other) {
+        return Optional.of(gson.toJsonTree(current.getVersion()).getAsJsonObject());
     }
 }

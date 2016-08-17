@@ -10,6 +10,8 @@
 
 package nl.matsv.paaaas.module.modules.metadata;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.VersionMeta;
 import nl.matsv.paaaas.data.metadata.MetadataEntry;
@@ -30,6 +32,8 @@ import java.util.jar.JarFile;
 public class MetadataModule extends Module {
     @Autowired
     private StorageManager storageManager;
+    @Autowired
+    private Gson gson;
     private Map<String, ClassNode> classes = new HashMap<>();
     private String entity;
     private String dataWatcher;
@@ -37,7 +41,7 @@ public class MetadataModule extends Module {
 
     @Override
     public void run(VersionDataFile versionDataFile) {
-        if (versionDataFile.getVersion().getReleaseTime().getTime() < 1292976000000L){
+        if (versionDataFile.getVersion().getReleaseTime().getTime() < 1292976000000L) {
             VersionMeta meta = versionDataFile.getMetadata();
 
             meta.setEnabled(false);
@@ -78,11 +82,11 @@ public class MetadataModule extends Module {
         // Using magic technology find classes :D
         entity = findClassFromConstant("entityBaseTick");
         entityTypes = findClassFromConstant("Skipping Entity with id {}");
-        if(entityTypes == null){
+        if (entityTypes == null) {
             // 1.9.4 & below
             entityTypes = findClassFromConstant("Skipping Entity with id ");
         }
-        if(entity == null) {
+        if (entity == null) {
             // b1.8.1 & below
             entity = findClassFromConstant("FallDistance"); // woo nbt
         }
@@ -131,6 +135,11 @@ public class MetadataModule extends Module {
         versionDataFile.setMetadataTree(output);
     }
 
+    @Override
+    public Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other) {
+        return Optional.of(gson.toJsonTree(current.getMetadataTree()).getAsJsonObject());
+    }
+
     private Optional<String> resolveName(String clazz) {
         if (clazz.equals(entity)) Optional.of("Entity");
 
@@ -158,6 +167,7 @@ public class MetadataModule extends Module {
         }
         return output;
     }
+
     private List<MetadataEntry> metadata(String name) {
         List<MetadataEntry> results = new ArrayList<>();
         ClassNode node = classes.get(name);

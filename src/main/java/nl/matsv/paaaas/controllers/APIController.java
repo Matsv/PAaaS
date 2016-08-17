@@ -10,6 +10,10 @@
 
 package nl.matsv.paaaas.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import nl.matsv.paaaas.data.VersionDataFile;
+import nl.matsv.paaaas.module.ModuleLoader;
 import nl.matsv.paaaas.storage.StorageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +21,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping(value = "/v1")
 public class APIController {
     @Autowired
-    StorageManager storageManager;
+    private ModuleLoader moduleLoader;
+    @Autowired
+    private StorageManager storageManager;
+    @Autowired
+    private Gson gson;
+
 
     @RequestMapping(value = "/compare", method = RequestMethod.GET)
-    public void compare(@RequestParam("old") String oldVersion, @RequestParam("new") String newVersion) {
-        throw new UnsupportedOperationException("Not implemented yet");
-        // TODO return comparison json and require 2 args, old and new
+    public String compare(@RequestParam("old") String oldVersion, @RequestParam("new") String newVersion) {
+        Optional<VersionDataFile> oldData = storageManager.getVersion(oldVersion);
+        Optional<VersionDataFile> newData = storageManager.getVersion(newVersion);
+
+        // TODO CACHE VERSIONDATAFILES
+        if (oldData.isPresent() && newData.isPresent() && oldData.get().getMetadata().isEnabled() && newData.get().getMetadata().isEnabled()){
+            return gson.toJson(moduleLoader.compareModules(oldData.get(), newData.get()));
+        } else {
+            throw new IllegalArgumentException("One of the selected version doesn't exist or is not enabled.");
+        }
     }
 }

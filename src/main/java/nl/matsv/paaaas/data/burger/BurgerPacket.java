@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-@Data
 public class BurgerPacket {
     @SerializedName("class")
     private String claz;
@@ -26,4 +25,31 @@ public class BurgerPacket {
     private boolean from_server;
     private int id;
     private List<BurgerInstruction> instructions;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BurgerPacket that = (BurgerPacket) o;
+
+        if (from_client != that.from_client) return false;
+        if (from_server != that.from_server) return false;
+        if (id != that.id) return false;
+        if (!direction.equals(that.direction)) return false;
+        if (!state.equals(that.state)) return false;
+        return instructions != null ? instructions.equals(that.instructions) : that.instructions == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = direction.hashCode();
+        result = 31 * result + state.hashCode();
+        result = 31 * result + (from_client ? 1 : 0);
+        result = 31 * result + (from_server ? 1 : 0);
+        result = 31 * result + id;
+        result = 31 * result + (instructions != null ? instructions.hashCode() : 0);
+        return result;
+    }
 }

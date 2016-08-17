@@ -10,24 +10,34 @@
 
 package nl.matsv.paaaas.module.modules;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.data.VersionMeta;
+import nl.matsv.paaaas.data.burger.BurgerOutput;
+import nl.matsv.paaaas.data.burger.BurgerPacket;
+import nl.matsv.paaaas.data.burger.BurgerPackets;
 import nl.matsv.paaaas.module.Module;
 import nl.matsv.paaaas.services.BurgerService;
 import nl.matsv.paaaas.storage.StorageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class BurgerModule extends Module {
     @Autowired
     private BurgerService burgerService;
     @Autowired
     private StorageManager storageManager;
+    @Autowired
+    private Gson gson;
 
     @Override
     public void run(VersionDataFile versionDataFile) {
-        if (versionDataFile.getVersion().getReleaseTime().getTime() < 1400112000000L){
+        if (versionDataFile.getVersion().getReleaseTime().getTime() < 1400112000000L) {
             VersionMeta meta = versionDataFile.getMetadata();
 
             meta.setEnabled(false);
@@ -43,7 +53,7 @@ public class BurgerModule extends Module {
             return;
         }
 
-        if (!burgerService.hasMainFile()){
+        if (!burgerService.hasMainFile()) {
             System.out.println("Cannot start Burger because the munch.py file doesn't exists ");
             return;
         }
@@ -59,5 +69,31 @@ public class BurgerModule extends Module {
             versionDataFile.getMetadata().addError(e.getLocalizedMessage());
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other) {
+        if (current.getBurgerData() == null)
+            return Optional.empty();
+
+        BurgerOutput bout = current.getBurgerData();
+
+        JsonObject output = new JsonObject();
+
+        output.add("protocol", gson.toJsonTree(
+                bout.getVersion().containsKey("protocol") ?
+                        bout.getVersion().get("protocol") : "Not provided by Burger")
+        );
+
+        Map<String, BurgerPacket> changedPackets = new HashMap<>();
+
+        BurgerPackets otherPackets = other.getBurgerData().getPackets();
+        bout.getPackets().getPacket().entrySet().stream()
+                .filter(entry ->
+                        !(otherPackets.getPacket().containsKey(entry.getKey()) && otherPackets.getPacket().get(entry.getKey()).equals(entry.getValue())))
+                        .forEach(entry -> changedPackets.put(entry.getKey(), entry.getValue()));
+
+        output.add("changedPackets", gson.toJsonTree(changedPackets));
+        return Optional.of(output);
     }
 }

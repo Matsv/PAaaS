@@ -103,6 +103,7 @@ public class BurgerService {
             return false;
         } else {
             FileReader fileReader = new FileReader(getTempFile());
+
             JsonArray array = (JsonArray) new JsonParser().parse(fileReader);
             BurgerOutput output = gson.fromJson(array.get(0).getAsJsonObject(), BurgerOutput.class);
 
