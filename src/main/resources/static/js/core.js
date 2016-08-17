@@ -50,16 +50,33 @@ var web = {
             template.format(newVersion.id, newVersion.type, newVersion.releaseTime, "pidNew"));
     },
     addPacket: function (oldVersion, newVersion) {
+        var oldTitle, oldData, newTitle, newData;
+        if (typeof oldVersion === 'undefined') {
+            oldTitle = "<strong>NON-EXISTENT</strong>";
+            oldData = "";
+        } else {
+            oldTitle = this.getPacketTitle(oldVersion);
+            oldData = htmlParser.getInstructions(oldVersion.instructions, 0);
+        }
+        if (typeof newVersion === 'undefined') {
+            newTitle = "<strong>REMOVED</strong>";
+            newData = "";
+        } else {
+            newTitle = this.getPacketTitle(oldVersion);
+            newData = htmlParser.getInstructions(oldVersion.instructions, 0);
+        }
+
+
         this.addHtml(
-            this.getPacketTitle(oldVersion),
-            htmlParser.getInstructions(oldVersion.instructions, 0),
-            this.getPacketTitle(newVersion),
-            htmlParser.getInstructions(newVersion.instructions, 0)
+            oldTitle,
+            oldData,
+            newTitle,
+            newData
         );
     },
     getPacketTitle: function (packet) {
         console.log(packet);
-        return "<strong>" + packet.state + ": </strong><ins>" + packet.id + "</ins> (" + packet.class + ") - " + packet.direction
+        return "<strong>" + packet.state + ": </strong><ins>0x" + Number(packet.id).toString(16) + "</ins> (" + packet.class + ") - " + packet.direction
     },
     setProtocolId: function (oldId, newId) {
         $("#pidOld").html(oldId);
