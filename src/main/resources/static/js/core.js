@@ -104,13 +104,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code old\"><div id='tree'></div></div>"
+                + "           <div class=\"panel-footer code oldMeta\"><div id=\"tree\"></div></div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code new\"><div id='tree'></div></div>"
+                + "           <div class=\"panel-footer code newMeta\"><div id=\"tree\"></div></div>"
                 + "       </div>"
                 + "    </div>");
         web.generateTree(oldV, newV);
