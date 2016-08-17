@@ -81,7 +81,7 @@ public class MetadataModule extends Module {
 
         // Using magic technology find classes :D
         entity = findClassFromConstant("entityBaseTick");
-        entityTypes = findClassFromConstant("Skipping Entity with id {}");
+        entityTypes = findClassFromConstant("Skipping Entity with id {}", "Item");
         if (entityTypes == null) {
             // 1.9.4 & below
             entityTypes = findClassFromConstant("Skipping Entity with id ");
@@ -207,16 +207,19 @@ public class MetadataModule extends Module {
         return results;
     }
 
-    private String findClassFromConstant(String str) {
+    private String findClassFromConstant(String... str) {
         for (Map.Entry<String, ClassNode> s : classes.entrySet()) {
+            List<String> toFind = new ArrayList<>(Arrays.asList(str));
             ClassNode clazz = s.getValue();
             List<MethodNode> methods = clazz.methods;
             for (MethodNode method : methods) {
                 for (AbstractInsnNode insnNode : method.instructions.toArray()) {
                     if (insnNode instanceof LdcInsnNode) {
                         LdcInsnNode ldc = (LdcInsnNode) insnNode;
-                        if (str.equals(ldc.cst)) {
-                            return s.getKey();
+                        if (toFind.contains(ldc.cst)) {
+                            toFind.remove(ldc.cst);
+                            if (toFind.size() == 0)
+                                return s.getKey();
                         }
                     }
                 }
