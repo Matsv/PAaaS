@@ -62,8 +62,8 @@ var web = {
             newTitle = "<strong>REMOVED</strong>";
             newData = "";
         } else {
-            newTitle = this.getPacketTitle(oldVersion);
-            newData = htmlParser.getInstructions(oldVersion.instructions, 0);
+            newTitle = this.getPacketTitle(newVersion);
+            newData = htmlParser.getInstructions(newVersion.instructions, 0);
         }
 
 
