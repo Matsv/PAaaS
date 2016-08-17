@@ -104,13 +104,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code oldMeta\"><div id='tree'></div></div>"
+                + "           <div class=\"panel-footer code old\"><div id='tree'></div></div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code newMeta\"><div id='tree'></div></div>"
+                + "           <div class=\"panel-footer code new\"><div id='tree'></div></div>"
                 + "       </div>"
                 + "    </div>");
         web.generateTree(oldV, newV);
@@ -127,6 +127,11 @@ var web = {
     },
     convertMeta: function (meta) {
         meta.text = meta.index + ": " + meta.type;
+        meta.nodeId = meta.index;
+        delete meta.index;
+        delete meta.field;
+        delete meta.function;
+        delete meta.type;
         return meta;
     },
     convertTree: function (tree) {
@@ -137,6 +142,7 @@ var web = {
         for (var i in tree.metadata) {
             tree.nodes.push(web.convertMeta(tree.metadata[i]));
         }
+        tree.nodeId = 10;
         delete tree.metadata;
         delete tree.children;
         if (tree.entityName == "") {
@@ -145,6 +151,8 @@ var web = {
             tree.text = tree.entityName + " (" + tree.className + ")"
         }
         tree.icon = "fa fa-smile-o";
+        delete tree.entityName;
+        delete tree.className;
         return tree;
     }
 };
