@@ -141,7 +141,7 @@ public class MetadataModule extends Module {
     }
 
     private Optional<String> resolveName(String clazz) {
-        if (clazz.equals(entity)) Optional.of("Entity");
+        if (clazz.equals(entity)) return Optional.of("Entity");
 
         ClassNode entityTypesNode = classes.get(entityTypes);
         InvokeClassStringExtractor extractor = new InvokeClassStringExtractor(clazz, entityTypes);
