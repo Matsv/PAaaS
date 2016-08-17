@@ -37,7 +37,7 @@ public class MinecraftTask {
     private ModuleLoader moduleLoader;
 
     public void checkVersions() throws Exception {
-        String json = IOUtils.toString(new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json"), StandardCharsets.UTF_8);
+        String json = IOUtils.toString(new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json?" + System.currentTimeMillis()), StandardCharsets.UTF_8);
         MinecraftData mcData = gson.fromJson(json, MinecraftData.class);
 
         for (MinecraftVersion version : mcData.getVersions()) {
