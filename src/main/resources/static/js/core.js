@@ -88,13 +88,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">" + title + "</div>"
-                + "           <div class=\"panel-footer code\">" + footer + "</div>"
+                + "           <div class=\"panel-footer\">" + footer + "</div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">" + newTitle + "</div>"
-                + "           <div class=\"panel-footer code\">" + newFooter + "</div>"
+                + "           <div class=\"panel-footer\">" + newFooter + "</div>"
                 + "       </div>"
                 + "    </div>");
     },
@@ -104,13 +104,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code oldMeta\"><div id=\"tree\"></div></div>"
+                + "           <div class=\"panel-footer oldMeta\"><div id=\"tree\"></div></div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer code newMeta\"><div id=\"tree\"></div></div>"
+                + "           <div class=\"panel-footer newMeta\"><div id=\"tree\"></div></div>"
                 + "       </div>"
                 + "    </div>");
         web.generateTree(oldV, newV);
@@ -122,17 +122,23 @@ var web = {
         web.convertTree(oldTree);
         web.convertTree(newTree);
         console.info([newTree]);
-        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
-        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999});
+        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999, showTags: true}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
+        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999, showTags: true});
+    },
+    parseType: function(desc) {
+        if (desc.charAt(0) == "[") {
+            return web.parseType(desc.substring(6, desc.length - 3)) + " Array";
+        } else {
+            var type = desc.substring(5, desc.length - 3);
+            if(type.substring(0, 31) == "com/google/common/base/Optional") {
+                return "Optional " + type.substring(33, type.length - 2);
+            }
+            return type;
+        }
     },
     convertMeta: function (meta) {
-        if (meta.type.charAt(0) == "[") {
-            meta.text = "<b>" + meta.index + ".</b> " + meta.type.substring(6, meta.type.length - 3) + " Array";
-        } else {
-            meta.text = "<b>" + meta.index + ".</b> " + meta.type.substring(5, meta.type.length - 3);
-        }
+        meta.text = "<b>" + meta.index + ".</b> " + web.parseType(meta.type);
 
-        meta.nodeId = meta.index;
         delete meta.index;
         delete meta.field;
         delete meta.function;
@@ -144,12 +150,20 @@ var web = {
         for (var i in tree.metadata) {
             tree.nodes.push(web.convertMeta(tree.metadata[i]));
         }
+        // sort the children because we are good parents
+        tree.children.sort(function compare(a, b) {
+            if (a.entityName == "" && b.entityName == "")
+                return a.className.localeCompare(b.className);
+            if (a.entityName == "")
+                return -1;
+            if (b.entityName == "")
+                return 1;
+            return a.entityName.localeCompare(b.entityName);
+        });
+
         for (var i in tree.children) {
             tree.nodes.push(web.convertTree(tree.children[i]));
         }
-        tree.nodeId = 10;
-        delete tree.metadata;
-        delete tree.children;
         if (tree.entityName == "") {
             tree.text = "Unknown (" + tree.className + ")"
         } else {
@@ -157,6 +171,9 @@ var web = {
         }
         tree.icon = "fa fa-smile-o";
         tree.backColor = "#eff4ff";
+        tree.tags = [tree.metadata.length + " tag(s)"];
+        delete tree.metadata;
+        delete tree.children;
         delete tree.entityName;
         delete tree.className;
 
