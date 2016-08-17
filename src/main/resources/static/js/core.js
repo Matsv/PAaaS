@@ -122,8 +122,8 @@ var web = {
         web.convertTree(oldTree);
         web.convertTree(newTree);
         console.info([newTree]);
-        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))]}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
-        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))]});
+        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
+        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999});
     },
     convertMeta: function (meta) {
         if (meta.type.charAt(0) == "[") {
@@ -156,8 +156,12 @@ var web = {
             tree.text = tree.entityName + " (" + tree.className + ")"
         }
         tree.icon = "fa fa-smile-o";
+        tree.backColor = "#eff4ff";
         delete tree.entityName;
         delete tree.className;
+
+        if (tree.nodes.length == 0)
+            delete tree.nodes;
         return tree;
     }
 };
