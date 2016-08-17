@@ -126,7 +126,12 @@ var web = {
         $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))]});
     },
     convertMeta: function (meta) {
-        meta.text = meta.index + ": " + meta.type;
+        if (meta.type.charAt(0) == "[") {
+            meta.text = "<b>" + meta.index + ".</b> " + meta.type.substring(6, meta.type.length - 3) + " Array";
+        } else {
+            meta.text = "<b>" + meta.index + ".</b> " + meta.type.substring(5, meta.type.length - 3);
+        }
+
         meta.nodeId = meta.index;
         delete meta.index;
         delete meta.field;
@@ -136,11 +141,11 @@ var web = {
     },
     convertTree: function (tree) {
         tree.nodes = [];
-        for (var i in tree.children) {
-            tree.nodes.push(web.convertTree(tree.children[i]));
-        }
         for (var i in tree.metadata) {
             tree.nodes.push(web.convertMeta(tree.metadata[i]));
+        }
+        for (var i in tree.children) {
+            tree.nodes.push(web.convertTree(tree.children[i]));
         }
         tree.nodeId = 10;
         delete tree.metadata;
