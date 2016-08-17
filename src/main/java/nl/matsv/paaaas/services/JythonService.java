@@ -45,12 +45,11 @@ public class JythonService {
         // Fix a few variables
         interpreter.set("__file__", new PyString(pythonScript.getAbsolutePath()));
         interpreter.set("__name__", new PyString("__main__"));
-        interpreter.set("track", new PyObject());
         // Run & Wait!
         Throwable exception = null;
         try {
             interpreter.execfile(pythonScript.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             exception = e;
         }
         return exception;
