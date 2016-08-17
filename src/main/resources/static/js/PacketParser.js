@@ -82,7 +82,8 @@ var htmlParser = {
                 break;
             case "else":
                 this.addLine(html, level, true, "} else {");
-                this.addLine(html, level, false, this.getInstruction(instruction.instructions, level + 1));
+                console.log(this.getInstruction(instruction.instructions, level + 1));
+                this.addLine(html, level, false, this.getInstructions(instruction.instructions, level + 1));
                 break;
             case "yloop":
             case "loop":
