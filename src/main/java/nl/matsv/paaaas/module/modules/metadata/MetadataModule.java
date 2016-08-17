@@ -156,7 +156,7 @@ public class MetadataModule extends Module {
 
         List<MetadataEntry> mt = metadata(tree.getName());
         output.setClassName(tree.getName());
-        output.setEntityName(resolveName(tree.getName()));
+        output.setEntityName(resolveName(tree.getName()).orElse(""));
 
         for (MetadataEntry meta : mt) {
             meta.setIndex(i++);

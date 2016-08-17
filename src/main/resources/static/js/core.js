@@ -97,6 +97,55 @@ var web = {
                 + "           <div class=\"panel-footer code\">" + newFooter + "</div>"
                 + "       </div>"
                 + "    </div>");
+    },
+    addMetadata: function (oldV, newV) {
+        $("#data")
+            .append("<div class=\"row\">"
+                + "   <div class=\"col-md-6\">"
+                + "       <div class=\"panel panel-danger\">"
+                + "           <div class=\"panel-heading\">Metadata</div>"
+                + "           <div class=\"panel-footer code\"><div id='old'></div></div>"
+                + "       </div>"
+                + "    </div>"
+                + "   <div class=\"col-md-6\">"
+                + "       <div class=\"panel panel-success\">"
+                + "           <div class=\"panel-heading\">Metadata</div>"
+                + "           <div class=\"panel-footer code\"><div id='new'></div></div>"
+                + "       </div>"
+                + "    </div>");
+        web.generateTree(oldV, newV);
+    },
+
+    generateTree: function (oldV, newV) {
+        var oldTree = oldV;
+        var newTree = newV;
+        web.convertTree(oldTree);
+        web.convertTree(newTree);
+        console.info([newTree]);
+        $('#old').treeview({data: [oldTree]});
+        $('#new').treeview({data: [newTree]});
+    },
+    convertMeta: function (meta) {
+        meta.text = meta.index + ": " + meta.type;
+        return meta;
+    },
+    convertTree: function (tree) {
+        tree.nodes = [];
+        for (var i in tree.children) {
+            tree.nodes.push(web.convertTree(tree.children[i]));
+        }
+        for (var i in tree.metadata) {
+            tree.nodes.push(web.convertMeta(tree.metadata[i]));
+        }
+        delete tree.metadata;
+        delete tree.children;
+        if (tree.entityName == "") {
+            tree.text = "Unknown (" + tree.className + ")"
+        } else {
+            tree.text = tree.entityName + " (" + tree.className + ")"
+        }
+        tree.icon = "fa fa-smile-o";
+        return tree;
     }
 };
 
@@ -155,9 +204,8 @@ function registerModules() {
         });
     })
 
-    //TODO METADATA
     moduleManager.on("MetadataModule", function (oldV, newV) {
-
+        web.addMetadata(oldV, newV)
     })
 }
 $(document).ready(function () {

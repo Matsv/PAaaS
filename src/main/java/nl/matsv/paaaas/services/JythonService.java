@@ -10,14 +10,12 @@
 
 package nl.matsv.paaaas.services;
 
-import org.python.core.*;
-import org.python.core.finalization.FinalizeTrigger;
+import org.python.core.PyString;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 
 @Service
 public class JythonService {
