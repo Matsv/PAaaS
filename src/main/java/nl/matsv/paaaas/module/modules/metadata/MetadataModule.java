@@ -38,6 +38,11 @@ public class MetadataModule extends Module {
     private String entity;
     private String dataWatcher;
     private String entityTypes;
+    private String livingEntity;
+    private String projectile;
+    private String insentient;
+    private String hanging;
+    private String ambient;
 
     @Override
     public void run(VersionDataFile versionDataFile) {
@@ -81,6 +86,11 @@ public class MetadataModule extends Module {
 
         // Using magic technology find classes :D
         entity = findClassFromConstant("entityBaseTick");
+        livingEntity = findClassFromConstant("livingEntityBaseTick");
+        projectile = findClassFromConstant("ownerName", "inGround");
+        insentient = findClassFromConstant("Unknown target reason, please report on the issue tracker");
+        hanging = findClassFromConstant("Unknown target reason, please report on the issue tracker");
+
         entityTypes = findClassFromConstant("Skipping Entity with id {}", "Item");
         if (entityTypes == null) {
             // 1.9.4 & below
@@ -142,6 +152,10 @@ public class MetadataModule extends Module {
 
     private Optional<String> resolveName(String clazz) {
         if (clazz.equals(entity)) return Optional.of("Entity");
+        if (clazz.equals(livingEntity)) return Optional.of("LivingEntity");
+        if (clazz.equals(projectile)) return Optional.of("Projectile");
+        if (clazz.equals(insentient)) return Optional.of("Insentient");
+        if (clazz.equals(hanging)) return Optional.of("Projectile");
 
         ClassNode entityTypesNode = classes.get(entityTypes);
         InvokeClassStringExtractor extractor = new InvokeClassStringExtractor(clazz, entityTypes);
