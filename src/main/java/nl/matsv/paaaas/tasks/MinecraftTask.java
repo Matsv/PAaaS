@@ -16,10 +16,10 @@ import nl.matsv.paaaas.data.VersionMeta;
 import nl.matsv.paaaas.data.minecraft.MinecraftData;
 import nl.matsv.paaaas.data.minecraft.MinecraftVersion;
 import nl.matsv.paaaas.module.ModuleLoader;
+import nl.matsv.paaaas.services.VersionService;
 import nl.matsv.paaaas.storage.StorageManager;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +34,8 @@ public class MinecraftTask {
     @Autowired
     private StorageManager storageManager;
     @Autowired
+    private VersionService versionService;
+    @Autowired
     private ModuleLoader moduleLoader;
 
     public void checkVersions() throws Exception {
@@ -47,6 +49,8 @@ public class MinecraftTask {
                 moduleLoader.runModules(vdf);
                 // Save Data File!
                 storageManager.saveVersion(vdf);
+
+                versionService.refreshVersions();
             }
         }
     }

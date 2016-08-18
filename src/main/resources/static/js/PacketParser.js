@@ -17,11 +17,13 @@ var dataTypes = {
         this.data.put("short", "writeShort");
         this.data.put("int", "writeInt");
         this.data.put("varint", "writeVarInt");
+        this.data.put("varint[]", "writeVarIntArray");
         this.data.put("chatcomponent", "writeChatComponent");
         this.data.put("position", "writePosition");
         this.data.put("enum", "writeVarIntEnum");
         this.data.put("float", "writeFloat");
         this.data.put("long", "writeLong");
+        this.data.put("varlong", "writeVarLong");
         this.data.put("double", "writeDouble");
         this.data.put("string16", "writeString");
         this.data.put("string8", "writeStringUTF");
@@ -29,6 +31,7 @@ var dataTypes = {
         this.data.put("itemstack", "writeItemStack");
         this.data.put("metadata", "writeMetadata");
         this.data.put("uuid", "writeUUID");
+        this.data.put("nbtcompound", "writeNBT");
     },
 
     contains: function (name) {

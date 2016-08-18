@@ -75,7 +75,6 @@ var web = {
         );
     },
     getPacketTitle: function (packet) {
-        console.log(packet);
         return "<strong>" + packet.state + ": </strong><ins>0x" + Number(packet.id).toString(16) + "</ins> (" + packet.class + ") - " + packet.direction
     },
     setProtocolId: function (oldId, newId) {
@@ -211,7 +210,6 @@ var moduleManager = {
         // console.log(JSON.stringify(data));
 
         Object.keys(json.oldVersion).forEach(function (key, index) {
-            console.log(key + " " + moduleManager.modules);
             if (!moduleManager.modules.hasOwnProperty(key))
                 console.error("No module found " + key + " [" + JSON.stringify({}) + "]");
             else
@@ -226,8 +224,6 @@ var moduleManager = {
 function registerModules() {
     // info about the jar
     moduleManager.on("JarModule", function (oldV, newV) {
-        console.log(oldV);
-        console.log(newV);
         web.addInfo(oldV, newV);
     });
 
@@ -236,7 +232,7 @@ function registerModules() {
         Object.keys(oldV.changedPackets).forEach(function (key, index) {
             web.addPacket(oldV.changedPackets[key], newV.changedPackets[key]);
         });
-    })
+    });
 
     moduleManager.on("MetadataModule", function (oldV, newV) {
         web.addMetadata(oldV, newV)

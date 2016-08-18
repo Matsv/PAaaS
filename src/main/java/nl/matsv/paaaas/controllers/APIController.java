@@ -11,10 +11,9 @@
 package nl.matsv.paaaas.controllers;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.ModuleLoader;
-import nl.matsv.paaaas.storage.StorageManager;
+import nl.matsv.paaaas.services.VersionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,21 +28,31 @@ public class APIController {
     @Autowired
     private ModuleLoader moduleLoader;
     @Autowired
-    private StorageManager storageManager;
+    private VersionService versionService;
     @Autowired
     private Gson gson;
 
 
     @RequestMapping(value = "/compare", method = RequestMethod.GET)
     public String compare(@RequestParam("old") String oldVersion, @RequestParam("new") String newVersion) {
-        Optional<VersionDataFile> oldData = storageManager.getVersion(oldVersion);
-        Optional<VersionDataFile> newData = storageManager.getVersion(newVersion);
+        Optional<VersionDataFile> oldData = versionService.getVersion(oldVersion);
+        Optional<VersionDataFile> newData = versionService.getVersion(newVersion);
 
-        // TODO CACHE VERSIONDATAFILES
         if (oldData.isPresent() && newData.isPresent() && oldData.get().getMetadata().isEnabled() && newData.get().getMetadata().isEnabled()){
             return gson.toJson(moduleLoader.compareModules(oldData.get(), newData.get()));
         } else {
             throw new IllegalArgumentException("One of the selected version doesn't exist or is not enabled.");
         }
+    }
+
+    @RequestMapping(value = "/get", method = RequestMethod.GET)
+    public VersionDataFile get(@RequestParam("id") String id) {
+        Optional<VersionDataFile> data = versionService.getVersion(id);
+        if (data.isPresent()) {
+            return data.get();
+        } else {
+            throw new IllegalArgumentException("No version found with id: " + id);
+        }
+
     }
 }

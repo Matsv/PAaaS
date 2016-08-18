@@ -13,7 +13,6 @@ package nl.matsv.paaaas.storage;
 import com.google.gson.Gson;
 import lombok.Getter;
 import nl.matsv.paaaas.data.VersionDataFile;
-import nl.matsv.paaaas.data.minecraft.MinecraftVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -76,22 +75,15 @@ public class StorageManager {
                 .collect(Collectors.toList());
     }
 
-    public List<MinecraftVersion> getEnabledVersions() {
-        List<MinecraftVersion> versions = new ArrayList<>();
-
-        // Collect enabled versions
-        for (String version : getVersions()) {
-            Optional<VersionDataFile> vdf = getVersion(version);
-            if (vdf.isPresent() && vdf.get().getMetadata().isEnabled())
-                versions.add(vdf.get().getVersion());
+    public Map<String, VersionDataFile> getVersionDataFiles() {
+        Map<String, VersionDataFile> map = new HashMap<>();
+        for (String s : getVersions()) {
+            Optional<VersionDataFile> op = getVersion(s);
+            if (op.isPresent())
+                map.put(s, op.get());
         }
 
-        // Sort on release time
-        Collections.sort(versions, (o1, o2) -> {
-            if (o1.getReleaseTime() == null || o2.getReleaseTime() == null)
-                return 0;
-            return o2.getReleaseTime().compareTo(o1.getReleaseTime());
-        });
-        return versions;
+        return map;
     }
+
 }
