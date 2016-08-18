@@ -119,35 +119,54 @@ var web = {
         var oldTree = oldV;
         var newTree = newV;
         web.convertTree(oldTree);
-        web.convertTree(newTree);
-        console.info([newTree]);
+        web.convertTree(newTree, oldTree);
         $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999, showTags: true}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
         $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999, showTags: true});
     },
-    parseType: function(desc) {
+    parseType: function (desc) {
         if (desc.charAt(0) == "[") {
             return web.parseType(desc.substring(6, desc.length - 3)) + " Array";
         } else {
             var type = desc.substring(5, desc.length - 3);
-            if(type.substring(0, 31) == "com/google/common/base/Optional") {
+            if (type.substring(0, 31) == "com/google/common/base/Optional") {
                 return "Optional " + type.substring(33, type.length - 2);
             }
             return type;
         }
     },
-    convertMeta: function (meta) {
+    convertMeta: function (meta, oldTree) {
         meta.text = "<b>" + meta.index + ".</b> " + web.parseType(meta.type);
-
+        meta.data = {type: meta.type, index: meta.index};
+        if (oldTree != undefined) {
+            if (oldTree != "not_found") {
+                var found = false;
+                for (var i2 in oldTree.nodes) {
+                    if (oldTree.nodes[i2].data.index == meta.index && web.parseType(oldTree.nodes[i2].data.type) == web.parseType(meta.data.type)) {
+                        found = true;
+                        break;
+                    }
+                    if (oldTree.nodes[i2].data.index == meta.index && web.parseType(oldTree.nodes[i2].data.type) != web.parseType(meta.data.type)) {
+                        meta.backColor = "#AAFA89";
+                        break;
+                    }
+                }
+                if (!found)
+                    meta.backColor = "#AAFA89";
+            } else {
+                meta.backColor = "#AAFA89";
+            }
+        }
         delete meta.index;
         delete meta.field;
         delete meta.function;
         delete meta.type;
         return meta;
     },
-    convertTree: function (tree) {
+    convertTree: function (tree, oldTree) {
         tree.nodes = [];
+        tree.data = {entity: tree.entityName}
         for (var i in tree.metadata) {
-            tree.nodes.push(web.convertMeta(tree.metadata[i]));
+            tree.nodes.push(web.convertMeta(tree.metadata[i], oldTree));
         }
         // sort the children because we are good parents
         tree.children.sort(function compare(a, b) {
@@ -161,7 +180,31 @@ var web = {
         });
 
         for (var i in tree.children) {
-            tree.nodes.push(web.convertTree(tree.children[i]));
+            if (oldTree != undefined) {
+                var childTree = "not_found";
+                var last = undefined;
+                var num = 0;
+                if (oldTree != "not_found") {
+                    for (var i2 in oldTree.nodes) {
+                        if (oldTree.nodes[i2].data.entity != "" && tree.children[i].entityName != "") {
+                            if (oldTree.nodes[i2].data.entity == tree.children[i].entityName) {
+                                childTree = oldTree.nodes[i2];
+                                break;
+                            }
+                        }
+                        if (oldTree.nodes[i2].data.entity != undefined) {
+                            last = oldTree.nodes[i2];
+                            num++;
+                        }
+                    }
+                    if (oldTree != "not_found" && num == 1 && tree.children.length == 1) {
+                        childTree = last; // do do do, inspector gadget
+                    }
+                }
+                tree.nodes.push(web.convertTree(tree.children[i], childTree));
+            } else {
+                tree.nodes.push(web.convertTree(tree.children[i]));
+            }
         }
         if (tree.entityName == "") {
             tree.text = "Unknown (" + tree.className + ")"
@@ -169,7 +212,11 @@ var web = {
             tree.text = tree.entityName + " (" + tree.className + ")"
         }
         tree.icon = "fa fa-smile-o";
-        tree.backColor = "#eff4ff";
+        if (oldTree == "not_found") {
+            tree.backColor = "#d3ffc1";
+        } else {
+            tree.backColor = "#eff4ff";
+        }
         tree.tags = [tree.metadata.length + " tag(s)"];
         delete tree.metadata;
         delete tree.children;
