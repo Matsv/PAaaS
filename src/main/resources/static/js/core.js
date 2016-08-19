@@ -82,36 +82,31 @@ var web = {
         $("#pidNew").html(newId);
     },
     addHtml: function (title, footer, newTitle, newFooter) {
-        $("#data")
-            .append("<div class=\"row\">"
-                + "   <div class=\"col-md-6\">"
-                + "       <div class=\"panel panel-danger\">"
-                + "           <div class=\"panel-heading\">" + title + "</div>"
-                + "           <div class=\"panel-footer\">" + footer + "</div>"
-                + "       </div>"
-                + "    </div>"
-                + "   <div class=\"col-md-6\">"
-                + "       <div class=\"panel panel-success\">"
-                + "           <div class=\"panel-heading\">" + newTitle + "</div>"
-                + "           <div class=\"panel-footer\">" + newFooter + "</div>"
-                + "       </div>"
-                + "    </div>");
+        var data = document.getElementById("data");
+
+        var row = this.createElement("div", "row", "", data);
+        this.setInner("panel-danger", title, footer, row);
+        this.setInner("panel-success", newTitle, newFooter, row);
+    },
+    setInner: function (claz, title, footer, sub) {
+        var col = this.createElement("div", "col-md-6", "", sub);
+        var panel = this.createElement("div", "panel " + claz, "", col);
+        this.createElement("div", "panel-heading", title, panel);
+        this.createElement("div", "panel-body", footer, panel);
+    },
+    createElement: function (type, claz, value, sub) {
+        var el = document.createElement(type);
+        el.className = claz;
+        if (typeof value !== "undefined") { // TODO Do research to find the correct way to check this.
+            el.innerHTML = value;
+        }
+        if (typeof sub !== "undefined") {
+            sub.appendChild(el);
+        }
+        return el;
     },
     addMetadata: function (oldV, newV) {
-        $("#data")
-            .append("<div class=\"row\">"
-                + "   <div class=\"col-md-6\">"
-                + "       <div class=\"panel panel-danger\">"
-                + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer\"><div id=\"oldTree\"></div></div>"
-                + "       </div>"
-                + "    </div>"
-                + "   <div class=\"col-md-6\">"
-                + "       <div class=\"panel panel-success\">"
-                + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer\"><div id=\"newTree\"></div></div>"
-                + "       </div>"
-                + "    </div>");
+        this.addHtml("<strong>Metadata</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata</strong>", "<div id=\"newTree\"></div>");
         web.generateTree(oldV, newV);
     },
 
