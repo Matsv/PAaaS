@@ -103,13 +103,13 @@ var web = {
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-danger\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer oldMeta\"><div id=\"tree\"></div></div>"
+                + "           <div class=\"panel-footer\"><div id=\"oldTree\"></div></div>"
                 + "       </div>"
                 + "    </div>"
                 + "   <div class=\"col-md-6\">"
                 + "       <div class=\"panel panel-success\">"
                 + "           <div class=\"panel-heading\">Metadata</div>"
-                + "           <div class=\"panel-footer newMeta\"><div id=\"tree\"></div></div>"
+                + "           <div class=\"panel-footer\"><div id=\"newTree\"></div></div>"
                 + "       </div>"
                 + "    </div>");
         web.generateTree(oldV, newV);
@@ -120,8 +120,8 @@ var web = {
         var newTree = newV;
         web.convertTree(oldTree);
         web.convertTree(newTree, oldTree);
-        $('.oldMeta #tree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999, showTags: true}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
-        $('.newMeta #tree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999, showTags: true});
+        $('#oldTree').treeview({data: [JSON.parse(JSON.stringify(oldTree))], levels: 999, showTags: true}); // TODO GET IT WORKING WITHOUT THIS HACKY FIX
+        $('#newTree').treeview({data: [JSON.parse(JSON.stringify(newTree))], levels: 999, showTags: true});
     },
     parseType: function (desc) {
         if (desc.charAt(0) == "[") {
