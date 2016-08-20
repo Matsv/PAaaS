@@ -10,15 +10,21 @@
 
 package nl.matsv.paaaas.services;
 
-import org.python.core.PyString;
-import org.python.core.PySystemState;
+import org.python.core.*;
+import org.python.core.finalization.FinalizableBuiltin;
+import org.python.core.finalization.FinalizeTrigger;
+import org.python.google.common.io.Files;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
+import java.io.*;
+import java.lang.ref.WeakReference;
+import java.nio.charset.Charset;
 
 @Service
 public class JythonService {
+    private static PyCode compiled = null;
+
     public Throwable execute(File pythonScript, String[] args, File[] classPath) {
         // Update environment variables, for storage.
         System.setProperty("python.home", new File("").getAbsolutePath());
@@ -46,7 +52,14 @@ public class JythonService {
         // Run & Wait!
         Throwable exception = null;
         try {
-            interpreter.execfile(pythonScript.getAbsolutePath());
+            if (compiled == null) {
+                try {
+                    compiled = Py.compile_flags(Files.toString(pythonScript, Charset.defaultCharset()), pythonScript.getAbsolutePath(), CompileMode.exec, new CompilerFlags());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            interpreter.exec(compiled);
         } catch (RuntimeException e) {
             exception = e;
         }
