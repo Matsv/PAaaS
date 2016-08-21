@@ -12,7 +12,6 @@ package nl.matsv.paaaas.data.burger;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 

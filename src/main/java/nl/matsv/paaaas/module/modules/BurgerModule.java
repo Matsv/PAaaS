@@ -91,7 +91,7 @@ public class BurgerModule extends Module {
         bout.getPackets().getPacket().entrySet().stream()
                 .filter(entry ->
                         !(otherPackets.getPacket().containsKey(entry.getKey()) && otherPackets.getPacket().get(entry.getKey()).equals(entry.getValue())))
-                        .forEach(entry -> changedPackets.put(entry.getKey(), entry.getValue()));
+                .forEach(entry -> changedPackets.put(entry.getKey(), entry.getValue()));
 
         output.add("changedPackets", gson.toJsonTree(changedPackets));
         return Optional.of(output);

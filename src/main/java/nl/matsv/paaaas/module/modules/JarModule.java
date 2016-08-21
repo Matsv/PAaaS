@@ -12,7 +12,6 @@ package nl.matsv.paaaas.module.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.Module;
 import nl.matsv.paaaas.storage.StorageManager;

@@ -11,14 +11,12 @@
 package nl.matsv.paaaas.services;
 
 import org.python.core.*;
-import org.python.core.finalization.FinalizableBuiltin;
-import org.python.core.finalization.FinalizeTrigger;
 import org.python.google.common.io.Files;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.lang.ref.WeakReference;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 @Service

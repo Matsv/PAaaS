@@ -25,13 +25,13 @@ public class VersionMeta {
     private boolean burger;
     private List<String> errors;
 
-    public void addError(String error){
+    public void addError(String error) {
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
         errors.add(format.format(new Date()) + ": " + error);
     }
 
-    public void addErrors(String[] errors){
+    public void addErrors(String[] errors) {
         for (String err : errors)
             addError(err);
     }

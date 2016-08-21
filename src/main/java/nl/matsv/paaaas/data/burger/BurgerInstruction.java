@@ -11,7 +11,6 @@
 package nl.matsv.paaaas.data.burger;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 

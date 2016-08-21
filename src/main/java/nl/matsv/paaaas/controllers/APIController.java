@@ -38,7 +38,7 @@ public class APIController {
         Optional<VersionDataFile> oldData = versionService.getVersion(oldVersion);
         Optional<VersionDataFile> newData = versionService.getVersion(newVersion);
 
-        if (oldData.isPresent() && newData.isPresent() && oldData.get().getMetadata().isEnabled() && newData.get().getMetadata().isEnabled()){
+        if (oldData.isPresent() && newData.isPresent() && oldData.get().getMetadata().isEnabled() && newData.get().getMetadata().isEnabled()) {
             return gson.toJson(moduleLoader.compareModules(oldData.get(), newData.get()));
         } else {
             throw new IllegalArgumentException("One of the selected version doesn't exist or is not enabled.");

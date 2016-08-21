@@ -77,7 +77,7 @@ public class BurgerService {
 
     private boolean removeTempFile() {
         File f = getTempFile();
-        if(f.exists()){
+        if (f.exists()) {
             try {
                 FileUtils.forceDelete(f);
             } catch (IOException e) {

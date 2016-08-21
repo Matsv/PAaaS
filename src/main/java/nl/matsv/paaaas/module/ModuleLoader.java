@@ -54,7 +54,7 @@ public class ModuleLoader {
         }
     }
 
-    public JsonObject compareModules(VersionDataFile oldV, VersionDataFile newV){
+    public JsonObject compareModules(VersionDataFile oldV, VersionDataFile newV) {
         JsonObject obj = new JsonObject();
 
         obj.add("oldVersion", new JsonObject());
