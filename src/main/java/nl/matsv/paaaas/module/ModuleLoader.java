@@ -19,6 +19,7 @@ import nl.matsv.paaaas.module.modules.metadata.MetadataModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,11 +51,19 @@ public class ModuleLoader {
 
     public void runModules(VersionDataFile vdf) {
         for (Class<? extends Module> module : modules) {
-            initModule(module).run(vdf);
+            Module m = initModule(module);
+            m.run(vdf);
+
+            // Force GC
+            WeakReference<Module> ref = new WeakReference<>(m);
+            m = null;
+            while (ref.get() != null) {
+                System.gc();
+            }
         }
     }
 
-    public JsonObject compareModules(VersionDataFile oldV, VersionDataFile newV){
+    public JsonObject compareModules(VersionDataFile oldV, VersionDataFile newV) {
         JsonObject obj = new JsonObject();
 
         obj.add("oldVersion", new JsonObject());

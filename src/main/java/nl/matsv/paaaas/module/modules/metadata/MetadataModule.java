@@ -143,6 +143,9 @@ public class MetadataModule extends Module {
         ClassTree tree = object.find(entity);
         MetadataTree output = metadataTree(tree, 0);
         versionDataFile.setMetadataTree(output);
+
+        // Clean up classes
+        classes.clear();
     }
 
     @Override
