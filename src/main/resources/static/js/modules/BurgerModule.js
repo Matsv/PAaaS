@@ -69,7 +69,6 @@ var burgerModule = {
     addPacket: function (json, parent) {
         var oldP = json.old;
         var newP = json.new;
-        console.log(JSON.stringify(json));
 
         var oldTitle, oldData, newTitle, newData;
         // Check added packet

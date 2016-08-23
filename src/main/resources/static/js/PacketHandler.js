@@ -74,7 +74,7 @@ var packetHandler = {
             loc[value.id] = output;
         }
 
-        if (newJson.changedPackets > 0) {
+        if (Object.keys(newJson).length > 0) {
             for (var newKey in newJson.changedPackets) {
                 var val = newJson.changedPackets[newKey];
                 packets[value.state][value.direction][val.id] = {
