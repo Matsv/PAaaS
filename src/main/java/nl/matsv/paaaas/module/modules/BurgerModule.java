@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class BurgerModule extends Module {
     @Autowired
@@ -77,7 +78,6 @@ public class BurgerModule extends Module {
             return Optional.empty();
 
         BurgerOutput bout = current.getBurgerData();
-
         JsonObject output = new JsonObject();
 
         output.add("protocol", gson.toJsonTree(
@@ -94,6 +94,13 @@ public class BurgerModule extends Module {
                 .forEach(entry -> changedPackets.put(entry.getKey(), entry.getValue()));
 
         output.add("changedPackets", gson.toJsonTree(changedPackets));
+
+        Set<String> states = bout.getPackets().getStates().keySet();
+        output.add("states", gson.toJsonTree(states.toArray()));
+
+        Set<String> directions = bout.getPackets().getDirections().keySet();
+        output.add("directions", gson.toJsonTree(directions.toArray()));
+
         return Optional.of(output);
     }
 }

@@ -44,8 +44,11 @@ var web = {
             e.preventDefault();
         });
     },
-    addHtml: function (title, footer, newTitle, newFooter) {
+    addHtml: function (title, footer, newTitle, newFooter, parent) {
         var data = document.getElementById("data");
+        if (parent != undefined) {
+            data = parent;
+        }
 
         var row = this.createElement("div", "row", "", data);
         this.setInner("panel-danger", title, footer, row);
@@ -64,6 +67,17 @@ var web = {
             el.innerHTML = value;
         }
         if (typeof sub !== "undefined") {
+            sub.appendChild(el);
+        }
+        return el;
+    },
+    createElementId: function (type, id, value, sub) {
+        var el = document.createElement(type);
+        el.id = id;
+        if (value != undefined) { // TODO Do research to find the correct way to check this.
+            el.innerHTML = value;
+        }
+        if (sub != undefined) {
             sub.appendChild(el);
         }
         return el;
@@ -98,6 +112,9 @@ var moduleManager = {
     on: function (name, func) {
         $.getScript("js/modules/" + name + ".js", function (data, textStatus, xhr) {
             if (textStatus === "success") {
+                var obj = func();
+                if ("register" in obj)
+                    obj.register();
                 moduleManager.modules[name] = func();
                 console.log("register module " + name);
             } else {
@@ -144,4 +161,11 @@ $(document).ready(function () {
 
     web.registerListeners();
     moduleManager.register();
+
+    // Fix anchor things
+    var shiftWindow = function () {
+        scrollBy(0, -65)
+    };
+    if (location.hash) shiftWindow();
+    window.addEventListener("hashchange", shiftWindow);
 });
