@@ -9,6 +9,7 @@
  */
 body {
     padding-top: 70px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 #handshaking_header { /* TODO find a better way to get the positions right */
