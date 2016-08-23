@@ -9,6 +9,9 @@
  */
 
 var burgerModule = {
+    register: function () {
+
+    },
     onCompare: function (oldV, newV) {
         this.setProtocolId(oldV.protocol, newV.protocol);
         Object.keys(oldV.changedPackets).forEach(function (key) {
