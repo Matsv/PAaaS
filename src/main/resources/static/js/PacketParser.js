@@ -10,39 +10,39 @@
 
 // Based of Burger Vitrine
 var dataTypes = {
-    data: new HashMap(),
+    data: {},
     registerTypes: function () {
-        this.data.put("byte", "writeByte");
-        this.data.put("boolean", "writeBoolean");
-        this.data.put("short", "writeShort");
-        this.data.put("int", "writeInt");
-        this.data.put("varint", "writeVarInt");
-        this.data.put("varint[]", "writeVarIntArray");
-        this.data.put("chatcomponent", "writeChatComponent");
-        this.data.put("position", "writePosition");
-        this.data.put("enum", "writeVarIntEnum");
-        this.data.put("float", "writeFloat");
-        this.data.put("long", "writeLong");
-        this.data.put("varlong", "writeVarLong");
-        this.data.put("double", "writeDouble");
-        this.data.put("string16", "writeString");
-        this.data.put("string8", "writeStringUTF");
-        this.data.put("byte[]", "writeBytes");
-        this.data.put("itemstack", "writeItemStack");
-        this.data.put("metadata", "writeMetadata");
-        this.data.put("uuid", "writeUUID");
-        this.data.put("nbtcompound", "writeNBT");
+        this.data["byte"] = "writeByte";
+        this.data["boolean"] = "writeBoolean";
+        this.data["short"] = "writeShort";
+        this.data["int"] = "writeInt";
+        this.data["varint"] = "writeVarInt";
+        this.data["varint[]"] = "writeVarIntArray";
+        this.data["chatcomponent"] = "writeChatComponent";
+        this.data["position"] = "writePosition";
+        this.data["enum"] = "writeVarIntEnum";
+        this.data["float"] = "writeFloat";
+        this.data["long"] = "writeLong";
+        this.data["varlong"] = "writeVarLong";
+        this.data["double"] = "writeDouble";
+        this.data["string16"] = "writeString";
+        this.data["string8"] = "writeStringUTF";
+        this.data["byte[]"] = "writeBytes";
+        this.data["itemstack"] = "writeItemStack";
+        this.data["metadata"] = "writeMetadata";
+        this.data["uuid"] = "writeUUID";
+        this.data["nbtcompound"] = "writeNBT";
     },
 
     contains: function (name) {
-        var contains = typeof this.data.get(name) != 'undefined';
+        var contains = name in this.data;
         if (!contains) console.error("UNKNOWN TYPE " + name);
 
         return contains;
     },
 
     get: function (name) {
-        return this.data.get(name);
+        return this.data[name];
     }
 };
 
