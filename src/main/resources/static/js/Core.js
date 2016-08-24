@@ -21,7 +21,6 @@ String.prototype.formatArg = function (args) {
     });
 };
 
-// TODO MAKE THIS WHOLE PART BETTER, I COPIED THIS FROM THE PROTOTYPE.
 var web = {
     isHidden: false,
     registerListeners: function () {
@@ -110,15 +109,16 @@ var moduleManager = {
      * @param func return the handle object
      */
     on: function (name, func) {
-        $.getScript("js/modules/" + name + ".js", function (data, textStatus, xhr) {
+        this.loadScript("/js/modules/" + name + ".js", function (data, textStatus, xhr) {
             if (textStatus === "success") {
                 var obj = func();
-                if ("register" in obj)
-                    obj.register();
+
+                if ("register" in obj) obj.register();
                 moduleManager.modules[name] = func();
-                console.log("register module " + name);
+
+                console.log("registered module " + name);
             } else {
-                console.error("Could not load module " + textStatus);
+                console.error("Could not load module {0}: {1}".format(name, textStatus));
                 console.error(xhr);
             }
         });
@@ -150,6 +150,17 @@ var moduleManager = {
         // Metadata output
         moduleManager.on("MetadataModule", function () {
             return metadataModule;
+        });
+    },
+
+    loadScript: function (path, callback) {
+        $.getScript(path, callback != undefined ? callback : function (data, textStatus, xhr) {
+            if (textStatus !== "success") {
+                console.error("Could not load " + path + " " + textStatus);
+                console.error(xhr);
+            } else {
+                console.log("Loaded script " + path);
+            }
         });
     }
 };

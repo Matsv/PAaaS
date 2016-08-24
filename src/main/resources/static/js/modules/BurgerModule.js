@@ -10,12 +10,9 @@
 
 var burgerModule = {
     register: function () {
-        $.getScript("js/PacketHandler.js", function (data, textStatus, xhr) {
-            if (textStatus !== "success") {
-                console.error("Could not load PacketHandler.js " + textStatus);
-                console.error(xhr);
-            }
-        });
+        // Load scripts
+        moduleManager.loadScript("/js/PacketParser.js");
+        moduleManager.loadScript("/js/PacketHandler.js");
     },
     onCompare: function (oldV, newV) {
         this.setProtocolId(oldV.protocol, newV.protocol);
