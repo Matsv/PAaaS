@@ -24,38 +24,13 @@ span.space {
     margin-bottom: 20px; /* TODO Find a better way to get the positions right */
 }
 
-.code {
-    font-family: "Source Code Pro", serif;
-    font-size: 1.2em;
-}
-
 .versionpicker {
     float: none;
     margin: 0 auto;
 }
 
-.new {
-    background-color: #3c763d
-}
-
 a {
     text-decoration: none;
-}
-
-/* Specify class=linenums on a pre to get line numbering; line numbers themselves are the same color as punctuation */
-ol.linenums {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #8B8970;
-}
-
-/* IE indents via margin-left */
-li.L0, li.L1, li.L2, li.L3, li.L5, li.L6, li.L7, li.L8 {
-    list-style-type: none
-}
-
-/* Alternate shading for lines */
-li.L1, li.L3, li.L5, li.L7, li.L9 {
 }
 
 .glyphicon-refresh-animate {
