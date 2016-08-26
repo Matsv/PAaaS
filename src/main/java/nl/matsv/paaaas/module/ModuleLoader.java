@@ -10,7 +10,6 @@
 
 package nl.matsv.paaaas.module;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nl.matsv.paaaas.data.VersionDataFile;
 import nl.matsv.paaaas.module.modules.BurgerModule;
@@ -18,16 +17,16 @@ import nl.matsv.paaaas.module.modules.JarModule;
 import nl.matsv.paaaas.module.modules.metadata.MetadataModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class ModuleLoader {
     private static List<Class<? extends Module>> modules = new ArrayList<>();
-    @Autowired
-    private Gson gson;
 
     static {
         // Add module

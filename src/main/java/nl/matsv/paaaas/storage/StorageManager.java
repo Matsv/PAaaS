@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import nl.matsv.paaaas.data.VersionDataFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileReader;
@@ -23,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
+@Component
 public class StorageManager {
     private final File jarDirectory;
     private final File dataDirectory;
