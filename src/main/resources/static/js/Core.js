@@ -118,7 +118,7 @@ var moduleManager = {
      * @param func return the handle object
      */
     on: function (name, func) {
-        this.loadScript("/js/modules/" + name + ".js", function (data, textStatus, xhr) {
+        this.loadScript("./js/modules/" + name + ".js", function (data, textStatus, xhr) {
             if (textStatus === "success") {
                 var obj = func();
 
