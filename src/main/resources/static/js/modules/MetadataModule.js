@@ -10,7 +10,7 @@
 
 var metadataModule = {
     onCompare: function (oldV, newV) {
-        web.addHtml("<strong>Metadata</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata</strong>", "<div id=\"newTree\"></div>"); // Todo
+        web.createDifferenceBox("<strong>Metadata</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata</strong>", "<div id=\"newTree\"></div>"); // Todo
         this.generateTree(oldV, newV);
     },
     generateTree: function (oldV, newV) {

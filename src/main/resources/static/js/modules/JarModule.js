@@ -15,7 +15,7 @@ var jarModule = {
         <strong>Version release time: </strong>{2} <br/> \
         <strong>Protocol id: </strong><span id={3}>Unknown</span>";
 
-        web.addHtml
+        web.createDifferenceBox
         (
             title,
             template.format(oldJson.id, oldJson.type, oldJson.releaseTime, "pidOld"),

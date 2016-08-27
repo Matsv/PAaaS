@@ -49,11 +49,12 @@ var packetHandler = {
 
         // Add all the states and directions
         for (var sta in states) {
-            if (states.hasOwnProperty(sta))
+            if (states.hasOwnProperty(sta)) {
                 packets[states[sta]] = {};
-            for (var dire in directions)
-                if (directions.hasOwnProperty(dire))
-                    packets[states[sta]][directions[dire]] = {};
+                for (var dire in directions)
+                    if (directions.hasOwnProperty(dire))
+                        packets[states[sta]][directions[dire]] = {};
+            }
         }
 
         for (var key in oldJson.changedPackets) {
@@ -71,6 +72,7 @@ var packetHandler = {
                 }
             }
 
+            this.compare(oldJson.old, oldJson.new);
             loc[value.id] = output;
         }
 
@@ -84,8 +86,14 @@ var packetHandler = {
                     "new": val
                 };
             }
+            this.compare(oldJson.old, oldJson.new);
         }
 
         return packets;
+    },
+
+    // TODO compare for fancy diff
+    compare: function (oldP, newP) {
+
     }
 };

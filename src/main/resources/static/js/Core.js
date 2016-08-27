@@ -44,15 +44,15 @@ var web = {
             e.preventDefault();
         });
     },
-    addHtml: function (title, footer, newTitle, newFooter, parent) {
+    createDifferenceBox: function (title, footer, newTitle, newFooter, parent, claz) {
         var data = document.getElementById("data");
         if (parent != undefined) {
             data = parent;
         }
 
         var row = this.createElement("div", "row", "", data);
-        this.setInner("panel-danger", title, footer, row);
-        this.setInner("panel-success", newTitle, newFooter, row);
+        this.setInner(claz != undefined ? "panel-danger " + claz : "panel-danger", title, footer, row);
+        this.setInner(claz != undefined ? "panel-success " + claz : "panel-success", newTitle, newFooter, row);
     },
     setInner: function (claz, title, footer, sub) {
         var col = this.createElement("div", "col-md-6", "", sub);
@@ -62,9 +62,17 @@ var web = {
     },
     createElement: function (type, claz, value, sub) {
         var el = document.createElement(type);
-        el.className = claz;
-        if (typeof value !== "undefined") { // TODO Do research to find the correct way to check this.
+        if (typeof claz === "string")
+            el.className = claz;
+        if (typeof value === "string") { // TODO Do research to find the correct way to check this.
             el.innerHTML = value;
+        } else if (value != undefined) {
+            if (value instanceof Array) {
+                for (var val in value)
+                    el.appendChild(value[val]);
+            } else {
+                el.appendChild(value);
+            }
         }
         if (typeof sub !== "undefined") {
             sub.appendChild(el);

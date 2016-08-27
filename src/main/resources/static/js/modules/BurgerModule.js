@@ -35,9 +35,6 @@ var burgerModule = {
                 }
             }
         }
-        // Object.keys(oldV.changedPackets).forEach(function (key) {
-        //     burgerModule.addPacket(oldV.changedPackets[key], newV.changedPackets[key]);
-        // });
     },
     getPacketDiv: function () {
         var row = web.createElementId("div", "row", "", document.getElementById("data"));
@@ -63,7 +60,7 @@ var burgerModule = {
         $("#pidOld").html(oldId);
         $("#pidNew").html(newId);
     },
-    addPacket: function (json, parent) {
+    addPacket: function (json, parent) { // TODO CLEANUP
         var oldP = json.old;
         var newP = json.new;
 
@@ -74,7 +71,12 @@ var burgerModule = {
             oldData = "";
         } else {
             oldTitle = this.getPacketTitle(oldP);
-            oldData = htmlParser.getInstructions(oldP.instructions, 0);
+
+            var oldTable = web.createElement("table", "instructionTable", "");
+            var oldTbody = web.createElement("tbody", "packetBody", "", oldTable);
+
+            new packetParser(oldTbody).parsePackets(oldP.instructions);
+            oldData = oldTable;
         }
         // Check removed packet
         if (newP.id == -1) {
@@ -82,15 +84,21 @@ var burgerModule = {
             newData = "";
         } else {
             newTitle = this.getPacketTitle(newP);
-            newData = htmlParser.getInstructions(newP.instructions, 0);
+
+            var newTable = web.createElement("table", "instructionTable", "");
+            var newTbody = web.createElement("tbody", "packetBody", "", newTable);
+
+            new packetParser(newTbody).parsePackets(newP.instructions);
+            newData = newTable;
         }
 
-        web.addHtml(
+        web.createDifferenceBox(
             oldTitle,
             oldData,
             newTitle,
             newData,
-            parent
+            parent,
+            "packetBox"
         );
     },
     getPacketTitle: function (packet) {

@@ -7,7 +7,6 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 // Based of Burger Vitrine
 var dataTypes = {
     data: {},
@@ -33,46 +32,47 @@ var dataTypes = {
         this.data["uuid"] = "writeUUID";
         this.data["nbtcompound"] = "writeNBT";
     },
-
     contains: function (name) {
         var contains = name in this.data;
         if (!contains) console.error("UNKNOWN TYPE " + name);
 
         return contains;
     },
-
     get: function (name) {
         return this.data[name];
     }
 };
+dataTypes.registerTypes();
 
-var htmlParser = {
-    getInstructions: function (instructions, level) {
+var packetParser = function (tbody) {
+    this.output = tbody;
+
+    this.parsePackets = function (instruction) {
+        return this.getInstructions(instruction, 0);
+    };
+
+    this.getInstructions = function (instructions, level) {
         var close = false;
         var caz = false;
 
-        var html = [];
         for (var instr in instructions) {
             var output = this.getInstruction(instructions[instr], close, caz, level);
             close = output.close;
             caz = output.caz;
-            html.push(output.data);
         }
         if (close)
-            this.addLine(html, level, true, "}");
+            this.addLine(level, "}");
+    };
 
-        return html.join("");
-    },
-    getInstruction: function (instruction, close, caz, level) {
-        var html = [];
+    this.getInstruction = function (instruction, close, caz, level) {
         if (caz)
             level += 1;
         if (close && !caz)
-            this.addLine(html, level, true, "}");
+            this.addLine(level, "}");
         close = true;
         switch (instruction.operation) {
             case "write":
-                this.addLine(html, level, true, "{0}({1});",
+                this.addLine(level, "{0}({1});",
                     [
                         dataTypes.contains(instruction.type) ? dataTypes.get(instruction.type) : instruction.type,
                         instruction.field
@@ -80,64 +80,69 @@ var htmlParser = {
                 close = false;
                 break;
             case "if":
-                this.addLine(html, level, true, "if({0}) {", [instruction.condition]);
-                this.addLine(html, level, false, this.getInstructions(instruction.instructions, level + 1));
+                this.addLine(level, "if({0}) {", [instruction.condition]);
+                this.getInstructions(instruction.instructions, level + 1);
                 break;
             case "else":
-                this.addLine(html, level, true, "} else {");
-                this.addLine(html, level, false, this.getInstructions(instruction.instructions, level + 1));
+                this.addLine(level, "} else {");
+                this.getInstructions(instruction.instructions, level + 1);
                 break;
             case "yloop":
             case "loop":
-                this.addLine(html, level, true, "while({0}) {", [instruction.condition]);
-
-                this.addLine(html, level, false, this.getInstructions(instruction.instructions, level + 1));
+                this.addLine(level, "while({0}) {", [instruction.condition]);
+                this.getInstructions(instruction.instructions, level + 1);
                 break;
             case "switch":
-                this.addLine(html, level, true, "switch({0}) {", [instruction.field]);
-                this.addLine(html, level, false, this.getInstructions(instruction.instructions, level + 1));
+                this.addLine(level, "switch({0}) {", [instruction.field]);
+                this.getInstructions(instruction.instructions, level + 1);
                 break;
             case "case":
                 if (caz)
                     level -= 1;
-                this.addLine(html, level, true, "case {0}:", [instruction.value]);
+                this.addLine(level, "case {0}:", [instruction.value]);
                 close = false;
                 caz = true;
                 break;
             case "increment":
                 if (instruction.amount == 1)
-                    this.addLine(html, level, true, "{0}++;", [instruction.field]);
+                    this.addLine(level, "{0}++;", [instruction.field]);
                 else
-                    this.addLine(html, level, true, "{0} += {1};", [instruction.field, instruction.amount]);
+                    this.addLine(level, "{0} += {1};", [instruction.field, instruction.amount]);
                 close = false;
                 break;
             case "store":
-                this.addLine(html, level, true, "{0} {1} = {2};", [instruction.type, instruction.var, instruction.value]);
+                this.addLine(level, "{0} {1} = {2};", [instruction.type, instruction.var, instruction.value]);
                 close = false;
                 break;
             case "break":
-                this.addLine(html, level, true, "break;");
+                this.addLine(level, "break;");
                 break;
             default:
-                this.addLine(html, level, true, "// {0}", [instruction]);
+                this.addLine(level, "// {0}", [instruction]);
+                console.warn("Unknown operation: " + instruction.operation);
                 break;
         }
-        return {data: html.join(""), close: close, caz: caz};
-    },
-    // TODO is there a better way to do this?
-    addLine: function (html, level, newLine, s, objs) {
-        html.push(this.getSpaces(level, s.formatArg(objs)));
-        if (newLine)
-            html.push("<br/>");
-    },
-    getSpaces: function (amount, value) {
+        return {close: close, caz: caz};
+    };
+
+    this.addLine = function (level, output, objs) {
+        if (typeof output === "string")
+            this.output.appendChild(this.createTR("", this.getSpaces(level, output.formatArg(objs))));
+        else if (typeof output === "object")
+            this.output.appendChild(output);
+        else
+            console.error("Failed to add a line, unknown type: " + typeof output);
+    };
+    this.getSpaces = function (amount, value) {
         if (amount > 0) {
-            value = "<span class=\"space\">{0}</span>".formatArg([value]);
+            value = "<span class=\"space\">{0}</span>".formatArg([value]); // TODO Find a better way for this.
             return this.getSpaces(--amount, value);
         }
         return value;
+    };
+    this.createTR = function (style, value) {
+        var tr1 = web.createElement("tr", style, "");
+        web.createElement("td", "packetBox", value, tr1);
+        return tr1;
     }
 };
-
-
-dataTypes.registerTypes();

@@ -55,3 +55,25 @@ a {
         transform: scale(1) rotate(360deg);
     }
 }
+
+.packetBox .panel-body {
+    padding: 10px 0;
+}
+
+.packetBox .panel-body table {
+    margin-bottom: 0;
+}
+
+.instructionTable > tbody > tr > td {
+    padding: 0.2em 15px;
+}
+
+.instructionTable > tbody > tr.success {
+    background-color: #eaffea;
+    color: #2c3e50;
+}
+
+.instructionTable > tbody > tr.danger {
+    background-color: #ffecec; /* Totally not from GitHub */
+    color: #2c3e50;
+}
