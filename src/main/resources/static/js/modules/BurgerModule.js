@@ -11,8 +11,8 @@
 var burgerModule = {
     register: function () {
         // Load scripts
-        moduleManager.loadScript("/js/modules/burger/PacketParser.js");
-        moduleManager.loadScript("/js/modules/burger/PacketHandler.js");
+        moduleManager.loadScript("./js/modules/burger/PacketParser.js");
+        moduleManager.loadScript("./js/modules/burger/PacketHandler.js");
     },
     onCompare: function (oldV, newV) {
         this.setProtocolId(oldV.protocol, newV.protocol);
