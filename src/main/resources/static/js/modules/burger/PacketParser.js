@@ -44,8 +44,10 @@ var dataTypes = {
 };
 dataTypes.registerTypes();
 
-var packetParser = function (tbody) {
+var packetParser = function (tbody, style) {
     this.output = tbody;
+    this.style = style;
+    this.changed = false;
 
     this.parsePackets = function (instruction) {
         return this.getInstructions(instruction, 0);
@@ -70,6 +72,8 @@ var packetParser = function (tbody) {
         if (close && !caz)
             this.addLine(level, "}");
         close = true;
+        if ('changed' in instruction)
+            this.changed = instruction.changed;
         switch (instruction.operation) {
             case "write":
                 this.addLine(level, "{0}({1});",
@@ -127,7 +131,7 @@ var packetParser = function (tbody) {
 
     this.addLine = function (level, output, objs) {
         if (typeof output === "string")
-            this.output.appendChild(this.createTR("", this.getSpaces(level, output.formatArg(objs))));
+            this.output.appendChild(this.createTR(this.changed, this.getSpaces(level, output.formatArg(objs))));
         else if (typeof output === "object")
             this.output.appendChild(output);
         else
@@ -140,8 +144,8 @@ var packetParser = function (tbody) {
         }
         return value;
     };
-    this.createTR = function (style, value) {
-        var tr1 = web.createElement("tr", style, "");
+    this.createTR = function (changed, value) {
+        var tr1 = web.createElement("tr", changed ? this.style : undefined, "");
         web.createElement("td", "packetBox", value, tr1);
         return tr1;
     }

@@ -75,7 +75,7 @@ var burgerModule = {
             var oldTable = web.createElement("table", "instructionTable", "");
             var oldTbody = web.createElement("tbody", "packetBody", "", oldTable);
 
-            new packetParser(oldTbody).parsePackets(oldP.instructions);
+            new packetParser(oldTbody, "danger").parsePackets(oldP.instructions);
             oldData = oldTable;
         }
         // Check removed packet
@@ -88,7 +88,7 @@ var burgerModule = {
             var newTable = web.createElement("table", "instructionTable", "");
             var newTbody = web.createElement("tbody", "packetBody", "", newTable);
 
-            new packetParser(newTbody).parsePackets(newP.instructions);
+            new packetParser(newTbody, "success").parsePackets(newP.instructions);
             newData = newTable;
         }
 

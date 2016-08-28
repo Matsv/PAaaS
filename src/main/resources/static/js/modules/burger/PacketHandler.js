@@ -57,6 +57,10 @@ var packetHandler = {
             }
         }
 
+        // Compare both sides to not skip removed / added instructions
+        this.compare(oldJson.changedPackets, newJson.changedPackets);
+        this.compare(newJson.changedPackets, oldJson.changedPackets);
+
         for (var key in oldJson.changedPackets) {
             var value = oldJson.changedPackets[key];
             var loc = packets[value.state][value.direction];
@@ -71,8 +75,6 @@ var packetHandler = {
                     id: -1
                 }
             }
-
-            this.compare(oldJson.old, oldJson.new);
             loc[value.id] = output;
         }
 
@@ -83,17 +85,35 @@ var packetHandler = {
                     old: {
                         id: -1
                     },
-                    "new": val
+                    new: val
                 };
             }
-            this.compare(oldJson.old, oldJson.new);
         }
 
         return packets;
     },
 
-    // TODO compare for fancy diff
+    // Compare the packet instructions to have fancy diff view
     compare: function (oldP, newP) {
+        for (var packet in oldP) {
+            for (var instr in oldP[packet]["instructions"]) {
+                if (newP[packet] == undefined)
+                    oldP[packet]["instructions"][instr].changed = true;
+                else
+                    oldP[packet]["instructions"][instr].changed = !this.equalsInstruction(oldP[packet]["instructions"][instr], newP[packet]["instructions"][instr]);
+            }
+        }
+    },
 
+    // Do all the magic to check if the instructions are equal
+    equalsInstruction: function (o1, o2) {
+        if (o1 === o2) return true;
+        if (o1 == undefined || o2 == undefined) return false;
+
+        if (o1.operation != undefined ? o1.operation !== o2.operation : o2.operation != undefined) return false;
+        if (o1.type != undefined ? o1.type !== o2.type : o2.type != undefined) return false;
+        if (o1.var != undefined ? o1.var !== o2.var : o2.var != undefined) return false;
+        if (o1.amount != undefined ? o1.amount !== o2.amount : o2.amount != undefined) return false;
+        return o1.instructions != undefined ? this.equalsInstruction(o1.instructions, o2.instructions) : o2.instructions == null;
     }
 };

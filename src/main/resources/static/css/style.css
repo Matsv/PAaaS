@@ -62,6 +62,7 @@ a {
 
 .packetBox .panel-body table {
     margin-bottom: 0;
+    width: 100%;
 }
 
 .instructionTable > tbody > tr > td {
