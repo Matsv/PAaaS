@@ -96,8 +96,9 @@ var packetHandler = {
     // Compare the packet instructions to have fancy diff view
     compare: function (oldP, newP) {
         for (var packet in oldP) {
+            if (!("instructions" in oldP[packet])) continue;
             for (var instr in oldP[packet]["instructions"]) {
-                if (newP[packet] == undefined)
+                if (newP[packet] == undefined || newP[packet]["instructions"] == undefined)
                     oldP[packet]["instructions"][instr].changed = true;
                 else
                     oldP[packet]["instructions"][instr].changed = !this.equalsInstruction(oldP[packet]["instructions"][instr], newP[packet]["instructions"][instr]);
