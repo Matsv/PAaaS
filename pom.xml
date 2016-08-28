@@ -15,7 +15,7 @@
 
     <groupId>nl.matsv</groupId>
     <artifactId>PAaaS</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1-ALPHA</version>
     <packaging>jar</packaging>
 
     <name>PAaaS</name>
@@ -178,7 +178,7 @@
                                 <!-- Change main -->
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>nl.matsv.paaaas.Bootstrap</mainClass>
+                                    <mainClass>nl.matsv.paaas.Bootstrap</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
