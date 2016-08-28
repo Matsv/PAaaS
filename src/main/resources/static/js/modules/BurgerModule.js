@@ -45,7 +45,7 @@ var burgerModule = {
     },
     addState: function (state, packetDiv) {
         var stateDiv = web.createElement("div", state, "", packetDiv);
-        var headerClaz = web.createElement("div", "page-header", "", stateDiv);
+        var headerClaz = web.createElement("div", "page-header stateHead", "", stateDiv);
         headerClaz.id = state.toLowerCase() + "_header";
         var stateName = web.createElementId("h4", state, state, headerClaz);
         stateName.id = state;

@@ -12,10 +12,6 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
-#handshaking_header { /* TODO find a better way to get the positions right */
-    margin: 20px 0 20px;
-}
-
 span.space {
     padding-left: 1em;
 }
@@ -77,4 +73,12 @@ a {
 .instructionTable > tbody > tr.danger {
     background-color: #ffecec; /* Totally not from GitHub */
     color: #2c3e50;
+}
+
+.stateHead {
+    margin: 42px 0 2px;
+}
+
+#handshaking_header { /* TODO find a better way to get the positions right */
+    margin: 20px 0 2px;
 }
