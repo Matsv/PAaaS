@@ -38,9 +38,11 @@ var web = {
         });
 
         // Prevent modal closing
-        $('#beginModal').modal('show').on('hide.bs.modal', function (e) {
-            if (web.isHidden)
+        $('#versionPicker').modal('show').on('hide.bs.modal', function (e) {
+            if (web.isHidden) {
                 return;
+            }
+
             e.preventDefault();
         });
     },
@@ -142,7 +144,7 @@ var moduleManager = {
         });
 
         web.isHidden = true;
-        $("#beginModal").modal("hide");
+        $("#versionPicker").modal("hide");
     },
 
     register: function () {

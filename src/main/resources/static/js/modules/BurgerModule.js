@@ -75,7 +75,7 @@ var burgerModule = {
     },
     generateInstructions: function (packet, title, style) {
         var data = {};
-        if (packet.id == -1) {
+        if (packet.id === -1) {
             data.title = "<strong>{0}</strong>".format(title);
             data.body = "";
         } else {
