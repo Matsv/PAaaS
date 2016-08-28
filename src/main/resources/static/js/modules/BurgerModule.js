@@ -60,46 +60,34 @@ var burgerModule = {
         $("#pidOld").html(oldId);
         $("#pidNew").html(newId);
     },
-    addPacket: function (json, parent) { // TODO CLEANUP
-        var oldP = json.old;
-        var newP = json.new;
-
-        var oldTitle, oldData, newTitle, newData;
-        // Check added packet
-        if (oldP.id == -1) {
-            oldTitle = "<strong>NON-EXISTENT</strong>";
-            oldData = "";
-        } else {
-            oldTitle = this.getPacketTitle(oldP);
-
-            var oldTable = web.createElement("table", "instructionTable", "");
-            var oldTbody = web.createElement("tbody", "packetBody", "", oldTable);
-
-            new packetParser(oldTbody, "danger").parsePackets(oldP.instructions);
-            oldData = oldTable;
-        }
-        // Check removed packet
-        if (newP.id == -1) {
-            newTitle = "<strong>REMOVED</strong>";
-            newData = "";
-        } else {
-            newTitle = this.getPacketTitle(newP);
-
-            var newTable = web.createElement("table", "instructionTable", "");
-            var newTbody = web.createElement("tbody", "packetBody", "", newTable);
-
-            new packetParser(newTbody, "success").parsePackets(newP.instructions);
-            newData = newTable;
-        }
+    addPacket: function (json, parent) {
+        var oldData = this.generateInstructions(json.old, "NON-EXISTENT", "danger");
+        var newData = this.generateInstructions(json.new, "REMOVED", "success");
 
         web.createDifferenceBox(
-            oldTitle,
-            oldData,
-            newTitle,
-            newData,
+            oldData.title,
+            oldData.body,
+            newData.title,
+            newData.body,
             parent,
             "packetBox"
         );
+    },
+    generateInstructions: function (packet, title, style) {
+        var data = {};
+        if (packet.id == -1) {
+            data.title = "<strong>{0}</strong>".format(title);
+            data.body = "";
+        } else {
+            data.title = this.getPacketTitle(packet);
+
+            var table = web.createElement("table", "instructionTable", "");
+            var tBody = web.createElement("tbody", "packetBody", "", table);
+
+            new packetParser(tBody, style).parsePackets(packet.instructions);
+            data.body = table;
+        }
+        return data;
     },
     getPacketTitle: function (packet) {
         return "<strong>" + packet.state + ": </strong>" + packet.direction + " <ins>0x" + Number(packet.id).toString(16) + "</ins> (" + packet.class + ") ";// TODO
