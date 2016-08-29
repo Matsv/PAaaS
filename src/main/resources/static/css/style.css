@@ -34,6 +34,10 @@ a {
     -webkit-animation: spin2 .7s infinite linear;
 }
 
+.github {
+    margin-top: 0.3em; /*TODO FIX THE ALIGN PROPERLY*/
+}
+
 @-webkit-keyframes spin2 {
     from {
         -webkit-transform: rotate(0deg);
