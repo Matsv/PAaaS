@@ -32,9 +32,7 @@ var web = {
 
             var oldV = $("#old").find('option:selected').val();
             var newV = $("#new").find('option:selected').val();
-            setTimeout(function () {
-                dataHandler.requestCompare(oldV, newV);
-            }, 100); // TODO Find a better way to have the glyphicon-refresh visible without delaying the request
+            dataHandler.requestCompare(oldV, newV);
         });
 
         // Prevent modal closing
