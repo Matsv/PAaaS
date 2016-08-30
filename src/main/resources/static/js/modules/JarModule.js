@@ -18,9 +18,13 @@ var jarModule = {
         web.createDifferenceBox
         (
             title,
-            template.format(oldJson.id, oldJson.type, oldJson.releaseTime, "pidOld"),
+            template.format(oldJson.id, oldJson.type, this.createDate(oldJson.releaseTime), "pidOld"),
             title,
-            template.format(newJson.id, newJson.type, newJson.releaseTime, "pidNew")
+            template.format(newJson.id, newJson.type, this.createDate(newJson.releaseTime), "pidNew")
         );
+    },
+
+    createDate: function (time) {
+        return new Date(time).toString();
     }
 };
