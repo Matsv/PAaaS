@@ -89,6 +89,16 @@ var web = {
             sub.appendChild(el);
         }
         return el;
+    },
+    setAlert: function (enabled, error) {
+        var panic = $("#panic");
+        panic.html("<strong>ERROR:</strong> " + error);
+
+        if (enabled) {
+            panic.show()
+        } else {
+            panic.hide()
+        }
     }
 };
 
@@ -100,10 +110,19 @@ var dataHandler = {
             url: "./v1/compare",
             data: {"old": oldV, "new": newV},
             success: function (json) {
-                moduleManager.execute(json);
+                try {
+                    moduleManager.execute(json);
+
+                    web.isHidden = true;
+                    $("#versionPicker").modal("hide");
+                } catch (e) {
+                    web.setAlert(true, e);
+                    console.error(e);
+                }
             },
             error: function (err) {
-                console.log(err);
+                web.setAlert(true, err.responseText);
+                console.error(err);
             }
         });
     }
@@ -140,9 +159,6 @@ var moduleManager = {
             else
                 moduleManager.modules[key].onCompare(json["oldVersion"][key], json["newVersion"][key]);
         });
-
-        web.isHidden = true;
-        $("#versionPicker").modal("hide");
     },
 
     register: function () {
