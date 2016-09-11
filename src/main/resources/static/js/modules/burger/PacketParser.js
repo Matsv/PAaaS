@@ -139,7 +139,7 @@ var packetParser = function (tbody, style) {
     };
     this.getSpaces = function (amount, value) {
         if (amount > 0) {
-            value = "<span class=\"space\">{0}</span>".formatArg([value]); // TODO Find a better way for this.
+            value = web.createElement("span", "space", value);
             return this.getSpaces(--amount, value);
         }
         return value;
