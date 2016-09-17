@@ -21,4 +21,5 @@ public class WikiData {
     private final String url;
     // State - Bounding - Packet ID - Packet name
     private Map<String, Map<String, Map<Integer, String>>> packetIds;
+
 }

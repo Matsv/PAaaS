@@ -14,12 +14,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.python.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 @Service
 public class WikiExtractor {
@@ -62,8 +64,6 @@ public class WikiExtractor {
                             // TODO handle snapshots
                             if (!(url.get().toLowerCase().contains("title=protocol") || url.get().toLowerCase().contains("vg/protocol")))
                                 url = Optional.empty();
-                            else
-                                url = getEditUrl(url.get());
                         }
                     }
                 }
@@ -76,25 +76,74 @@ public class WikiExtractor {
         return maps;
     }
 
-    // TODO Extract packet names
-    public Map<String, Map<String, Map<Integer, String>>> getPacketNames(String url) throws IOException {
+    /**
+     * Extract packet names from the protocol page
+     *
+     * @param url wiki url
+     * @return A way too complex map (good luck :))
+     * @throws Exception Panic
+     */
+    public Map<String, Map<String, Map<Integer, String>>> getPacketNames(String url) throws Exception {
+        Map<String, Map<String, Map<Integer, String>>> dataMap = new TreeMap<>();
         Document doc = Jsoup.connect(url).get();
+        Elements wikitables = doc.select(".wikitable");
 
-        return null;
+        for (Element el : wikitables) {
+            Element tbody = el.select("tbody").get(0);
+            Elements trs = tbody.select("tr");
+
+            if (!isPacket(trs.get(0)))
+                continue;
+
+            Element tr = trs.get(1);
+            Elements tds = tr.select("td");
+
+            String packetName = findPacketName(el);
+            int id = Integer.parseInt(tds.get(0).text().substring(2), 16); // Remove 0x
+            String state = tds.get(1).text().toLowerCase();
+            String bounding = tds.get(2).text().toLowerCase() + "bound";
+
+            if (!dataMap.containsKey(state))
+                dataMap.put(state, Maps.newTreeMap());
+            if (!dataMap.get(state).containsKey(bounding))
+                dataMap.get(state).put(bounding, Maps.newTreeMap());
+            dataMap.get(state).get(bounding).put(id, packetName);
+        }
+
+        return dataMap;
     }
 
-    protected Optional<String> getEditUrl(String url) throws IOException {
-        Document doc = Jsoup.connect(url).get();
+    private String findPacketName(Element el) throws Exception {
+        Element previous = el.previousElementSibling();
 
-        Element el;
-        if ((el = doc.getElementById("#ca-edit")) != null || (el = doc.getElementById("ca-viewsource")) != null) {
-            Optional<Element> opa = Optional.ofNullable(el.select("a").first());
-            if (!opa.isPresent())
-                return Optional.empty();
-            return Optional.of(opa.get().attr("abs:href"));
-        } else {
-            System.out.println("Could not find any source/edit for wiki page: " + url);
-            return Optional.empty();
+        // At the moment never more than 10
+        for (int i = 0; i < 10; i++) {
+            if (hasAttr(previous, "span") && previous.select("span").first().classNames().contains("mw-headline")) {
+                return toSnakeCase(getPacketName(previous));
+            }
+            previous = previous.previousElementSibling();
         }
+
+        throw new Exception("No packet name found for " + el);
+    }
+
+    private String getPacketName(Element el) {
+        return el.select("span").first().text().toLowerCase();
+    }
+
+    // TODO Find a way inside jsoup to do this correctly
+    private boolean hasAttr(Element el, String attr) {
+        return Optional.ofNullable(el.select(attr).first()).isPresent();
+    }
+
+    private boolean isPacket(Element header) {
+        Elements ths = header.select("th");
+        return ths.get(0).text().equalsIgnoreCase("Packet ID") &&
+                ths.get(1).text().equalsIgnoreCase("State") &&
+                ths.get(2).text().equalsIgnoreCase("Bound To");
+    }
+
+    private String toSnakeCase(String text) {
+        return String.join("_", text.split(" "));
     }
 }
