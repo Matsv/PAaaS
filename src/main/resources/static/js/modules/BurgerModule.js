@@ -26,7 +26,8 @@ var burgerModule = {
                 var boundDiv = this.addBound(boundKey, stateKey, stateDiv);
                 var added = 0;
                 for (var packet in packets[stateKey][boundKey]) {
-                    this.addPacket(packets[stateKey][boundKey][packet], boundDiv);
+                    var packetObj = packets[stateKey][boundKey][packet];
+                    this.addPacket(packetObj, boundDiv, this.getPacketName(oldV.wiki_data, packetObj.old), this.getPacketName(newV.wiki_data, packetObj.new));
                     added++;
                 }
 
@@ -60,9 +61,9 @@ var burgerModule = {
         $("#pidOld").html(oldId);
         $("#pidNew").html(newId);
     },
-    addPacket: function (json, parent) {
-        var oldData = this.generateInstructions(json.old, "NON-EXISTENT", "danger");
-        var newData = this.generateInstructions(json.new, "REMOVED", "success");
+    addPacket: function (json, parent, oldName, newName) {
+        var oldData = this.generateInstructions(json.old, "NON-EXISTENT", "danger", oldName);
+        var newData = this.generateInstructions(json.new, "REMOVED", "success", newName);
 
         web.createDifferenceBox(
             oldData.title,
@@ -73,13 +74,26 @@ var burgerModule = {
             "packetBox"
         );
     },
-    generateInstructions: function (packet, title, style) {
+    getPacketName: function (wiki, packet) {
+        if (wiki != undefined && packet.id != -1) {
+            if (packet.state.toLowerCase() in wiki.packetNames) {
+                var state = wiki.packetNames[packet.state.toLowerCase()];
+                if (packet.direction.toLowerCase() in state) {
+                    var direction = state[packet.direction.toLowerCase()];
+                    if (packet.id in direction) {
+                        return direction[packet.id];
+                    }
+                }
+            }
+        }
+    },
+    generateInstructions: function (packet, title, style, name) {
         var data = {};
         if (packet.id === -1) {
             data.title = "<strong>{0}</strong>".format(title);
             data.body = "";
         } else {
-            data.title = this.getPacketTitle(packet);
+            data.title = this.getPacketTitle(packet, name);
 
             var table = web.createElement("table", "instructionTable", "");
             var tBody = web.createElement("tbody", "packetBody", "", table);
@@ -89,7 +103,8 @@ var burgerModule = {
         }
         return data;
     },
-    getPacketTitle: function (packet) {
-        return "<strong>" + packet.state + ": </strong>" + packet.direction + " <ins>0x" + Number(packet.id).toString(16) + "</ins> (" + packet.class + ") ";// TODO
+    // TODO IMPROVE DISPLAY
+    getPacketTitle: function (packet, packetName) {
+        return "<strong>" + packet.state + ": </strong>" + packet.direction + " <ins>0x" + Number(packet.id).toString(16) + "</ins> -><i><strong>" + (packetName != undefined ? packetName : "") + "</strong></i> (" + packet.class + ")";// TODO
     }
 };

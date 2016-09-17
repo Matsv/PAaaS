@@ -10,6 +10,7 @@
 
 package nl.matsv.paaas.services;
 
+import nl.matsv.paaas.data.wiki.WikiData;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,13 +19,31 @@ import org.python.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class WikiExtractor {
+
+    public Map<Integer, WikiData> extractWiki() throws IOException {
+        Map<Integer, String> versions = getVersions();
+
+        Map<Integer, WikiData> data = new ConcurrentHashMap<>();
+
+        for (Map.Entry<Integer, String> version : versions.entrySet()) {
+            try {
+                data.put(version.getKey(), new WikiData(version.getValue(), getPacketNames(version.getValue())));
+                System.out.println("Extracted protocol " + version.getKey() + " from wiki.vg");
+            } catch (Exception e) {
+                System.out.println("Failed to download wiki data for version " + version.getKey() + " (" + version.getValue() + ")");
+                e.printStackTrace();
+            }
+        }
+
+        return data;
+    }
 
     /**
      * Get all the versions that link to an official Protocol page
@@ -32,12 +51,12 @@ public class WikiExtractor {
      * @return A map with the protocol ID + edit url
      * @throws IOException
      */
-    public Map<Integer, String> getVersions() throws IOException {
+    protected Map<Integer, String> getVersions() throws IOException {
         Document doc = Jsoup.connect("http://wiki.vg/Protocol_version_numbers").get();
         Element table = doc.select(".wikitable").get(0);
         Element body = table.select("tbody").get(0);
 
-        Map<Integer, String> maps = new HashMap<>();
+        Map<Integer, String> maps = new TreeMap<>();
 
         for (Element tr : body.select("tr")) {
             Elements tds = tr.select("td");
@@ -83,14 +102,14 @@ public class WikiExtractor {
      * @return A way too complex map (good luck :))
      * @throws Exception Panic
      */
-    public Map<String, Map<String, Map<Integer, String>>> getPacketNames(String url) throws Exception {
+    protected Map<String, Map<String, Map<Integer, String>>> getPacketNames(String url) throws Exception {
         Map<String, Map<String, Map<Integer, String>>> dataMap = new TreeMap<>();
         Document doc = Jsoup.connect(url).get();
-        Elements wikitables = doc.select(".wikitable");
+        Elements wikiTables = doc.select(".wikitable");
 
-        for (Element el : wikitables) {
-            Element tbody = el.select("tbody").get(0);
-            Elements trs = tbody.select("tr");
+        for (Element el : wikiTables) {
+            Element tBody = el.select("tbody").get(0);
+            Elements trs = tBody.select("tr");
 
             if (!isPacket(trs.get(0)))
                 continue;
@@ -116,8 +135,8 @@ public class WikiExtractor {
     private String findPacketName(Element el) throws Exception {
         Element previous = el.previousElementSibling();
 
-        // At the moment never more than 10
-        for (int i = 0; i < 10; i++) {
+        // At the moment never more than 15 (Blame 1.7.10 :'()
+        for (int i = 0; i < 15; i++) {
             if (hasAttr(previous, "span") && previous.select("span").first().classNames().contains("mw-headline")) {
                 return toSnakeCase(getPacketName(previous));
             }
@@ -138,8 +157,9 @@ public class WikiExtractor {
 
     private boolean isPacket(Element header) {
         Elements ths = header.select("th");
-        return ths.get(0).text().equalsIgnoreCase("Packet ID") &&
-                ths.get(1).text().equalsIgnoreCase("State") &&
+        return ths.size() >= 3 &&
+                ths.get(0).text().equalsIgnoreCase("Packet ID") &&
+                (ths.get(1).text().equalsIgnoreCase("State") || ths.get(1).text().equalsIgnoreCase("Category")) &&
                 ths.get(2).text().equalsIgnoreCase("Bound To");
     }
 

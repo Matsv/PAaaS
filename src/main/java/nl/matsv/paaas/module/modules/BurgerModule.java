@@ -17,8 +17,10 @@ import nl.matsv.paaas.data.VersionMeta;
 import nl.matsv.paaas.data.burger.BurgerOutput;
 import nl.matsv.paaas.data.burger.BurgerPacket;
 import nl.matsv.paaas.data.burger.BurgerPackets;
+import nl.matsv.paaas.data.wiki.WikiData;
 import nl.matsv.paaas.module.Module;
 import nl.matsv.paaas.services.BurgerService;
+import nl.matsv.paaas.services.WikiService;
 import nl.matsv.paaas.storage.StorageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +37,8 @@ public class BurgerModule extends Module {
     private StorageManager storageManager;
     @Autowired
     private Gson gson;
+    @Autowired
+    private WikiService wikiService;
 
     @Override
     public void run(VersionDataFile versionDataFile) {
@@ -80,9 +84,11 @@ public class BurgerModule extends Module {
         BurgerOutput bout = current.getBurgerData();
         JsonObject output = new JsonObject();
 
+        Optional<String> protocolId = Optional.ofNullable(bout.getVersion().get("protocol"));
+
         output.add("protocol", gson.toJsonTree(
-                bout.getVersion().containsKey("protocol") ?
-                        bout.getVersion().get("protocol") : "Not provided by Burger")
+                protocolId.isPresent() ?
+                        protocolId.get() : "Not provided by Burger")
         );
 
         Map<String, BurgerPacket> changedPackets = new HashMap<>();
@@ -100,6 +106,19 @@ public class BurgerModule extends Module {
 
         Set<String> directions = bout.getPackets().getDirections().keySet();
         output.add("directions", gson.toJsonTree(directions.toArray()));
+
+        try {
+            if (protocolId.isPresent()) {
+                int pid = Integer.parseInt(protocolId.get());
+
+                Optional<WikiData> data = wikiService.getWikiData(pid);
+
+                if (data.isPresent())
+                    output.add("wiki_data", gson.toJsonTree(data.get()));
+            }
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
 
         return Optional.of(output);
     }

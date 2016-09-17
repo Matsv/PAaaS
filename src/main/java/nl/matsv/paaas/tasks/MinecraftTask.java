@@ -17,6 +17,7 @@ import nl.matsv.paaas.data.minecraft.MinecraftData;
 import nl.matsv.paaas.data.minecraft.MinecraftVersion;
 import nl.matsv.paaas.module.ModuleLoader;
 import nl.matsv.paaas.services.VersionService;
+import nl.matsv.paaas.services.WikiService;
 import nl.matsv.paaas.storage.StorageManager;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +38,13 @@ public class MinecraftTask {
     private VersionService versionService;
     @Autowired
     private ModuleLoader moduleLoader;
+    @Autowired
+    private WikiService wikiService;
 
     public void checkVersions() throws Exception {
         String json = IOUtils.toString(new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json?" + System.currentTimeMillis()), StandardCharsets.UTF_8);
         MinecraftData mcData = gson.fromJson(json, MinecraftData.class);
+        boolean changes = false;
 
         for (MinecraftVersion version : mcData.getVersions()) {
             if (!storageManager.hasVersion(version.getId())) {
@@ -51,8 +55,12 @@ public class MinecraftTask {
                 storageManager.saveVersion(vdf);
 
                 versionService.refreshVersions();
+                changes = true;
             }
         }
+
+        if (changes)
+            wikiService.refreshData();
     }
 
     @Scheduled(initialDelay = 0, fixedDelay = 1000 * 60) // Run every minute

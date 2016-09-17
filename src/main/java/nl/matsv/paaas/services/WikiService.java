@@ -8,18 +8,40 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package nl.matsv.paaas.data.wiki;
+package nl.matsv.paaas.services;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import nl.matsv.paaas.data.wiki.WikiData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-@Data
-@AllArgsConstructor
-public class WikiData {
-    private final String url;
-    // State - Bounding - Packet ID - Packet name
-    private Map<String, Map<String, Map<Integer, String>>> packetNames;
+@Service
+// TODO cache and create a task to refresh every x hours/minutes
+public class WikiService {
+    private final WikiExtractor wikiExtractor;
+    private Map<Integer, WikiData> map = new ConcurrentHashMap<>();
 
+    @Autowired
+    public WikiService(WikiExtractor wikiExtractor) {
+        this.wikiExtractor = wikiExtractor;
+        try {
+            refreshData();
+        } catch (IOException e) {
+            System.out.println("Failed to download the wiki data");
+        }
+    }
+
+    public void refreshData() throws IOException {
+        this.map = wikiExtractor.extractWiki();
+    }
+
+    public Optional<WikiData> getWikiData(int protocol) {
+        if (map.containsKey(protocol))
+            return Optional.ofNullable(map.get(protocol));
+        return Optional.empty();
+    }
 }
