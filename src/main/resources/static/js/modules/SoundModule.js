@@ -21,39 +21,43 @@ var soundModule = {
         var shift = 0;
         var shiftMessage = false;
         var changes = 0;
-        for (var soundIndex in newV) {
-            var oldIndex = oldV.indexOf(newV[soundIndex]);
-            if (oldIndex != soundIndex) {
-                if (oldIndex == -1) {
-                    web.createElement("div", "text-success", "<strong>New: " + soundIndex + " - " + newV[soundIndex] + "</strong>", body);
-                    shift += 1;
-                    shiftMessage = false;
-                    changes++;
-                } else {
-                    // Check if it's simply a shift
-                    if (shift != 0) {
-                        if (!shiftMessage) {
-                            shiftMessage = true;
-                            web.createElement("div", "text-warning", "<strong>Old: " + oldIndex + " and above, moved to " + soundIndex + " (from " + newV[soundIndex] + ")</strong>", body);
+        var max = Math.max(newV.length, oldV.length);
+        for (var i = 0; i < max; i++) {
+            if (i < oldV.length) {
+                var newIndex = newV.indexOf(oldV[i]);
+                if (newIndex != i) {
+                    if (newIndex == -1) {
+                        web.createElement("div", "text-danger", "<strong>Old: " + i + " was removed - " + oldV[i] + "</strong>", body);
+                        changes++;
+                        shift -= 1;
+                    }
+                }
+            }
+            if (i < newV.length) {
+                var oldIndex = oldV.indexOf(newV[i]);
+                if (oldIndex != i) {
+                    if (oldIndex == -1) {
+                        web.createElement("div", "text-success", "<strong>New: " + i + " - " + newV[i] + "</strong>", body);
+                        shift += 1;
+                        shiftMessage = false;
+                        changes++;
+                    } else {
+                        // Check if it's simply a shift
+                        if (shift != 0) {
+                            if (!shiftMessage) {
+                                shiftMessage = true;
+                                web.createElement("div", "text-warning", "<strong>Old: " + oldIndex + " and above, moved to " + i + " (from " + newV[i] + ")</strong>", body);
+                                changes++;
+                            }
+                        } else {
+                            web.createElement("div", "text-danger", "<strong>Old: " + oldIndex + " moved to " + i + " - " + newV[i] + "</strong>", body);
                             changes++;
                         }
-                    } else {
-                        web.createElement("div", "text-danger", "<strong>Old: " + oldIndex + " moved to " + soundIndex + " - " + newV[soundIndex] + "</strong>", body);
-                        changes++;
                     }
                 }
             }
         }
-        for (var soundIndex in oldV) {
-            var newIndex = newV.indexOf(oldV[soundIndex]);
-            if (newIndex != soundIndex) {
-                if (oldIndex == -1) {
-                    web.createElement("div", "text-danger", "<strong>Old: " + oldIndex + " was removed - " + newV[soundIndex] + "</strong>", body);
-                    changes++;
-                }
-            }
-        }
-        if(changes == 0) {
+        if (changes == 0) {
             web.createElement("div", "text-info", "<strong>No sounds changed!</strong>", body);
         }
         return body;
