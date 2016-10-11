@@ -48,7 +48,7 @@ public class MinecraftTask {
 
         for (MinecraftVersion version : mcData.getVersions()) {
             if (!storageManager.hasVersion(version.getId())) {
-                VersionDataFile vdf = new VersionDataFile(version, new VersionMeta(true, false, new ArrayList<>()), null, null);
+                VersionDataFile vdf = new VersionDataFile(version, new VersionMeta(true, false, new ArrayList<>()), null, null, null);
                 // Run Modules
                 moduleLoader.runModules(vdf);
                 // Save Data File!

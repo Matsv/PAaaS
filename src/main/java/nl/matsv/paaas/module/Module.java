@@ -10,7 +10,7 @@
 
 package nl.matsv.paaas.module;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import nl.matsv.paaas.data.VersionDataFile;
 
 import java.util.Optional;
@@ -18,5 +18,5 @@ import java.util.Optional;
 public abstract class Module {
     public abstract void run(VersionDataFile versionDataFile);
 
-    public abstract Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other);
+    public abstract Optional<JsonElement> compare(VersionDataFile current, VersionDataFile other);
 }

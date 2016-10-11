@@ -11,30 +11,27 @@
 package nl.matsv.paaas.module.modules.metadata;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.data.VersionMeta;
 import nl.matsv.paaas.data.metadata.MetadataEntry;
 import nl.matsv.paaas.data.metadata.MetadataTree;
-import nl.matsv.paaas.module.Module;
+import nl.matsv.paaas.module.modules.AbstractClassModule;
 import nl.matsv.paaas.storage.StorageManager;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-public class MetadataModule extends Module {
+public class MetadataModule extends AbstractClassModule {
     @Autowired
     private StorageManager storageManager;
     @Autowired
     private Gson gson;
-    private Map<String, ClassNode> classes = new HashMap<>();
     private String entity;
     private String dataWatcher;
     private String entityTypes;
@@ -42,7 +39,6 @@ public class MetadataModule extends Module {
     private String projectile;
     private String insentient;
     private String hanging;
-    private String ambient;
 
     @Override
     public void run(VersionDataFile versionDataFile) {
@@ -55,34 +51,8 @@ public class MetadataModule extends Module {
             System.out.println("Skip " + versionDataFile.getVersion().getId() + " for metadata because it's too old");
             return;
         }
-        File file = new File(storageManager.getJarDirectory(), versionDataFile.getVersion().getId() + ".jar");
-
-        // Generate Metadata
-        JarFile jarFile;
-        try {
-            jarFile = new JarFile(file);
-        } catch (IOException e) {
-            System.out.println("Missing jar file " + file.getAbsolutePath());
-            return;
-        }
-
-        Enumeration<JarEntry> iter = jarFile.entries();
-        while (iter.hasMoreElements()) {
-            JarEntry entry = iter.nextElement();
-            if (entry.getName().endsWith(".class") && (entry.getName().startsWith("net/minecraft") || !entry.getName().contains("/"))) {
-                ClassReader reader;
-                try {
-                    reader = new ClassReader(jarFile.getInputStream(entry));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
-
-                ClassNode node = new ClassNode();
-                reader.accept(node, ClassReader.EXPAND_FRAMES);
-                classes.put(entry.getName().replace('/', '.').replace(".class", ""), node);
-            }
-        }
+        // Load classes
+        loadClasses(storageManager, versionDataFile);
 
         // Using magic technology find classes :D
         entity = findClassFromConstant("entityBaseTick");
@@ -149,7 +119,7 @@ public class MetadataModule extends Module {
     }
 
     @Override
-    public Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other) {
+    public Optional<JsonElement> compare(VersionDataFile current, VersionDataFile other) {
         return Optional.of(gson.toJsonTree(current.getMetadataTree()).getAsJsonObject());
     }
 
@@ -224,24 +194,5 @@ public class MetadataModule extends Module {
         return results;
     }
 
-    private String findClassFromConstant(String... str) {
-        for (Map.Entry<String, ClassNode> s : classes.entrySet()) {
-            List<String> toFind = new ArrayList<>(Arrays.asList(str));
-            ClassNode clazz = s.getValue();
-            List<MethodNode> methods = clazz.methods;
-            for (MethodNode method : methods) {
-                for (AbstractInsnNode insnNode : method.instructions.toArray()) {
-                    if (insnNode instanceof LdcInsnNode) {
-                        LdcInsnNode ldc = (LdcInsnNode) insnNode;
-                        if (toFind.contains(ldc.cst)) {
-                            toFind.remove(ldc.cst);
-                            if (toFind.size() == 0)
-                                return s.getKey();
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
+
 }

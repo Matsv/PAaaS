@@ -16,6 +16,8 @@ import nl.matsv.paaas.data.burger.BurgerOutput;
 import nl.matsv.paaas.data.metadata.MetadataTree;
 import nl.matsv.paaas.data.minecraft.MinecraftVersion;
 
+import java.util.List;
+
 //TODO
 @Data
 @AllArgsConstructor
@@ -24,6 +26,7 @@ public class VersionDataFile {
     private VersionMeta metadata;
     private BurgerOutput burgerData;
     private MetadataTree metadataTree;
+    private List<String> sounds;
     // Store executed modules & versions
     // Store module data
 }

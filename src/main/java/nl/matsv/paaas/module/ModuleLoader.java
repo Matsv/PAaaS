@@ -10,10 +10,12 @@
 
 package nl.matsv.paaas.module;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.module.modules.BurgerModule;
 import nl.matsv.paaas.module.modules.JarModule;
+import nl.matsv.paaas.module.modules.SoundModule;
 import nl.matsv.paaas.module.modules.metadata.MetadataModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -33,6 +35,7 @@ public class ModuleLoader {
         modules.add(JarModule.class);
         modules.add(BurgerModule.class);
         modules.add(MetadataModule.class);
+        modules.add(SoundModule.class);
     }
 
     @Autowired
@@ -72,8 +75,8 @@ public class ModuleLoader {
         JsonObject newObject = obj.get("newVersion").getAsJsonObject();
 
         for (Class<? extends Module> module : modules) {
-            Optional<JsonObject> oldOutput = initModule(module).compare(oldV, newV);
-            Optional<JsonObject> newOutput = initModule(module).compare(newV, oldV);
+            Optional<JsonElement> oldOutput = initModule(module).compare(oldV, newV);
+            Optional<JsonElement> newOutput = initModule(module).compare(newV, oldV);
 
             if (oldOutput.isPresent() && newOutput.isPresent()) {
                 oldObject.add(module.getSimpleName(), oldOutput.get());

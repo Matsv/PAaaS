@@ -176,6 +176,11 @@ var moduleManager = {
         moduleManager.on("MetadataModule", function () {
             return metadataModule;
         });
+
+        // Sound output
+        moduleManager.on("SoundModule", function () {
+            return soundModule;
+        });
     },
 
     loadScript: function (path, callback) {

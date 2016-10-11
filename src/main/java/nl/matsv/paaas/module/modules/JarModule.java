@@ -11,6 +11,7 @@
 package nl.matsv.paaas.module.modules;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.module.Module;
@@ -58,7 +59,7 @@ public class JarModule extends Module {
     }
 
     @Override
-    public Optional<JsonObject> compare(VersionDataFile current, VersionDataFile other) {
+    public Optional<JsonElement> compare(VersionDataFile current, VersionDataFile other) {
         return Optional.of(gson.toJsonTree(current.getVersion()).getAsJsonObject());
     }
 }
