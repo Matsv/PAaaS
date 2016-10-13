@@ -54,13 +54,19 @@ public class ModuleLoader {
     public void runModules(VersionDataFile vdf) {
         for (Class<? extends Module> module : modules) {
             Module m = initModule(module);
-            m.run(vdf);
 
-            // Force GC
-            WeakReference<Module> ref = new WeakReference<>(m);
-            m = null;
-            while (ref.get() != null) {
-                System.gc();
+            try {
+                m.run(vdf);
+            } catch (Exception e) {
+                System.out.println("Failed to run module " + m.getClass().getName() + " for version " + vdf.getVersion().getId());
+                e.printStackTrace();
+            } finally {
+                // Force GC
+                WeakReference<Module> ref = new WeakReference<>(m);
+                m = null;
+                while (ref.get() != null) {
+                    System.gc();
+                }
             }
         }
     }
