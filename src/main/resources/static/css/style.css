@@ -34,6 +34,10 @@ a {
     -webkit-animation: spin2 .7s infinite linear;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 .github {
     margin-top: 0.3em; /*TODO FIX THE ALIGN PROPERLY*/
 }

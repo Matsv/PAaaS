@@ -41,7 +41,7 @@ var burgerModule = {
         var row = web.createElementId("div", "row", "", document.getElementById("data"));
         var col = web.createElement("div", "col-lg", "", row);
         var panel = web.createElement("div", "panel panel-info", "", col);
-        web.createElement("div", "panel-heading", "<strong>PACKETS</strong>", panel);
+        web.createElement("div", "panel-heading", "<strong>PACKETS</strong>" + web.getCollapse(), panel);
         return web.createElement("div", "panel-body", "", panel);
     },
     addState: function (state, packetDiv) {

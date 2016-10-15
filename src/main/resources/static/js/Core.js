@@ -43,6 +43,21 @@ var web = {
 
             e.preventDefault();
         });
+
+        // Based of http://bootsnipp.com/snippets/featured/collapsible-panel
+        $(document).on('click', '.panel-heading span.clickable', function (e) {
+            var $this = $(this);
+            console.log($this);
+            if (!$this.hasClass('panel-collapsed')) {
+                $this.closest('.panel').find('.panel-body').slideUp("fast");
+                $this.addClass('panel-collapsed');
+                $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+            } else {
+                $this.closest('.panel').find('.panel-body').slideDown("fast");
+                $this.removeClass('panel-collapsed');
+                $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+            }
+        })
     },
     createDifferenceBox: function (title, footer, newTitle, newFooter, parent, claz) {
         var data = document.getElementById("data");
@@ -57,8 +72,11 @@ var web = {
     setInner: function (claz, title, footer, sub) {
         var col = this.createElement("div", "col-md-6", "", sub);
         var panel = this.createElement("div", "panel " + claz, "", col);
-        this.createElement("div", "panel-heading", title, panel);
+        this.createElement("div", "panel-heading", title + this.getCollapse(), panel);
         this.createElement("div", "panel-body", footer, panel);
+    },
+    getCollapse: function () {
+        return "<span class=\"pull-right clickable\"><i class=\"glyphicon glyphicon-chevron-up\"></i></span>";
     },
     createElement: function (type, claz, value, sub) {
         var el = document.createElement(type);
