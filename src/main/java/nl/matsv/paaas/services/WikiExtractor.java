@@ -80,8 +80,12 @@ public class WikiExtractor {
                     } else {
                         url = Optional.ofNullable(opa.get().attr("href"));
                         if (url.isPresent()) {
+                            // The current protocol will directly link to /protocol TODO check if there is a better way to do this with jsoup
+                            if (url.get().toLowerCase().equals("/protocol"))
+                                url = Optional.of("http://wiki.vg/Protocol");
                             // TODO handle snapshots
-                            if (!(url.get().toLowerCase().contains("title=protocol") || url.get().toLowerCase().contains("vg/protocol")))
+                            if (!(url.get().toLowerCase().contains("title=protocol") ||
+                                    url.get().toLowerCase().contains("vg/protocol")))
                                 url = Optional.empty();
                         }
                     }
