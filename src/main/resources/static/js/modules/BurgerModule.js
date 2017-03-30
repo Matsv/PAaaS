@@ -94,12 +94,14 @@ var burgerModule = {
             data.body = "";
         } else {
             data.title = this.getPacketTitle(packet, name);
+            data.body = undefined;
+            if (packet.instructions != undefined) {
+                var table = web.createElement("table", "instructionTable", "");
+                var tBody = web.createElement("tbody", "packetBody", "", table);
 
-            var table = web.createElement("table", "instructionTable", "");
-            var tBody = web.createElement("tbody", "packetBody", "", table);
-
-            new packetParser(tBody, style).parsePackets(packet.instructions);
-            data.body = table;
+                new packetParser(tBody, style).parsePackets(packet.instructions);
+                data.body = table;
+            }
         }
         return data;
     },

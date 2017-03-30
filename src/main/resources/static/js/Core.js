@@ -57,8 +57,10 @@ var web = {
     setInner: function (claz, title, footer, sub) {
         var col = this.createElement("div", "col-md-6", "", sub);
         var panel = this.createElement("div", "panel " + claz, "", col);
-        this.createElement("div", "panel-heading", title, panel);
-        this.createElement("div", "panel-body", footer, panel);
+        if (title != undefined)
+            this.createElement("div", "panel-heading", title, panel);
+        if (footer != undefined)
+            this.createElement("div", "panel-body", footer, panel);
     },
     createElement: function (type, claz, value, sub) {
         var el = document.createElement(type);

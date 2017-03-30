@@ -56,28 +56,52 @@ var packetHandler = {
                         packets[states[sta]][directions[dire]] = {};
             }
         }
+        // Remap arrays to be id indexed
+        var temp = [];
+        for (var key in oldJson.changedPackets) {
+            temp[oldJson.changedPackets[key].id] = oldJson.changedPackets[key];
+        }
+        oldJson.changedPackets = temp;
 
+        var temp = [];
+        for (var key in newJson.changedPackets) {
+            temp[newJson.changedPackets[key].id] = newJson.changedPackets[key];
+        }
+        newJson.changedPackets = temp;
+
+
+        // Calculate the correct packets
+        this.reorder(oldJson.changedPackets, newJson.changedPackets);
         // Compare both sides to not skip removed / added instructions
         this.compare(oldJson.changedPackets, newJson.changedPackets);
         this.compare(newJson.changedPackets, oldJson.changedPackets);
 
         for (var key in oldJson.changedPackets) {
             var value = oldJson.changedPackets[key];
+            var newId = value.newId;
             var loc = packets[value.state][value.direction];
 
             var output = {"old": value};
-            if (key in newJson.changedPackets) {
-                output.new = newJson.changedPackets[key];
 
-                delete newJson.changedPackets[key];
+            if (newId != undefined) {
+                // don't display if nothing has changed
+                output.new = newJson.changedPackets[newId];
+                delete newJson.changedPackets[newId];
+                if (this.isSame(output.new, value)) {
+                    if (output.new.id == value.id) {
+                        continue;
+                    } else {
+                        output.new["instructions"] = undefined;
+                        output.old["instructions"] = undefined;
+                    }
+                }
             } else {
                 output.new = {
                     id: -1
                 }
             }
-            loc[value.id] = output;
+            loc[output.new.id] = output;
         }
-
         if (Object.keys(newJson).length > 0) {
             for (var newKey in newJson.changedPackets) {
                 var val = newJson.changedPackets[newKey];
@@ -89,7 +113,6 @@ var packetHandler = {
                 };
             }
         }
-
         return packets;
     },
 
@@ -97,13 +120,85 @@ var packetHandler = {
     compare: function (oldP, newP) {
         for (var packet in oldP) {
             if (!("instructions" in oldP[packet])) continue;
+            var newId = oldP[packet].newId;
             for (var instr in oldP[packet]["instructions"]) {
-                if (newP[packet] == undefined || newP[packet]["instructions"] == undefined)
+                if (newP[newId] == undefined || newP[newId]["instructions"] == undefined)
                     oldP[packet]["instructions"][instr].changed = true;
                 else
-                    oldP[packet]["instructions"][instr].changed = !this.equalsInstruction(oldP[packet]["instructions"][instr], newP[packet]["instructions"][instr]);
+                    oldP[packet]["instructions"][instr].changed = !this.equalsInstruction(oldP[packet]["instructions"][instr], newP[newId]["instructions"][instr]);
             }
         }
+    },
+
+    // Reorder the packets so that they match up
+    reorder: function (oldP, newP) {
+        // First iteration matches identical packets
+        loop1:
+            for (var packet1 in oldP) {
+                if (oldP[packet1].newId != undefined) {
+                    continue loop1;
+                }
+                // Search
+                for (var packet2 in newP) {
+                    if (this.isSame(oldP[packet1], newP[packet2]) && newP[packet2].newId == undefined) {
+                        oldP[packet1].newId = newP[packet2].id;
+                        newP[packet2].newId = oldP[packet1].id;
+                        continue loop1;
+                    }
+                }
+            }
+        // Second iteration (attempts to find closest match)
+        loop1:
+            for (var packet1 in oldP) {
+                if (oldP[packet1].newId != undefined) continue loop1;
+                // Search
+                var highest = undefined;
+                var score = Number.MAX_VALUE;
+                loop2:
+                    for (var packet2 in newP) {
+                        if (newP[packet2].newId != undefined) continue loop2;
+
+                        // Generate a score for this packet
+                        var totalDiff = Math.abs(oldP[packet1]["instructions"].length - newP[packet2]["instructions"].length)
+                        var instrDiff = 0;
+                        for (var instr in oldP[packet1]["instructions"]) {
+                            if (!this.equalsInstruction(oldP[packet1]["instructions"][instr], newP[packet2]["instructions"][instr])) {
+                                instrDiff++;
+                            }
+                        }
+                        var idDiff = Math.abs(oldP[packet1].id - newP[packet2].id);
+
+                        var weighted = (4 * idDiff) + (2 * instrDiff) * (1 * totalDiff)
+
+                        if (weighted < score) {
+                            score = weighted;
+                            highest = newP[packet2];
+                        }
+                    }
+                // Don't allow it to match any packet (must have a score less than this)
+                var max = (4 * 5) + (2 * 3) + (1 * 2);
+                if (score < max) {
+                    if (highest != undefined) {
+                        oldP[packet1].newId = highest.id;
+                        highest.newId = oldP[packet1].id;
+                    }
+                }
+            }
+    },
+
+    isSame: function (packet1, packet2) {
+        for (var instr in packet1["instructions"]) {
+            if (!this.equalsInstruction(packet1["instructions"][instr], packet2["instructions"][instr])) {
+                return false;
+            }
+        }
+        for (var instr in packet2["instructions"]) {
+            if (!this.equalsInstruction(packet2["instructions"][instr], packet1["instructions"][instr])) {
+                return false;
+            }
+        }
+        return true;
+        // return packet1.id == packet2.id;
     },
 
     // Do all the magic to check if the instructions are equal
