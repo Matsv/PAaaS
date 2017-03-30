@@ -81,7 +81,7 @@ var packetHandler = {
         if (Object.keys(newJson).length > 0) {
             for (var newKey in newJson.changedPackets) {
                 var val = newJson.changedPackets[newKey];
-                packets[value.state][value.direction][val.id] = {
+                packets[val.state][val.direction][val.id] = {
                     old: {
                         id: -1
                     },
