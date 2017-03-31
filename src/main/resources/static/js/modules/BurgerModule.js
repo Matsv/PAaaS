@@ -89,7 +89,7 @@ var burgerModule = {
     },
     generateInstructions: function (packet, title, style, name) {
         var data = {};
-        if (packet.id === -1) {
+        if (packet == undefined || packet.id === -1) {
             data.title = "<strong>{0}</strong>".format(title);
             data.body = "";
         } else {

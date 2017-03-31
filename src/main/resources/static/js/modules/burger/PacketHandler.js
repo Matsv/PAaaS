@@ -56,19 +56,6 @@ var packetHandler = {
                         packets[states[sta]][directions[dire]] = {};
             }
         }
-        // Remap arrays to be id indexed
-        var temp = [];
-        for (var key in oldJson.changedPackets) {
-            temp[oldJson.changedPackets[key].id] = oldJson.changedPackets[key];
-        }
-        oldJson.changedPackets = temp;
-
-        var temp = [];
-        for (var key in newJson.changedPackets) {
-            temp[newJson.changedPackets[key].id] = newJson.changedPackets[key];
-        }
-        newJson.changedPackets = temp;
-
 
         // Calculate the correct packets
         this.reorder(oldJson.changedPackets, newJson.changedPackets);
@@ -78,6 +65,7 @@ var packetHandler = {
 
         for (var key in oldJson.changedPackets) {
             var value = oldJson.changedPackets[key];
+            if (value == undefined) continue;
             var newId = value.newId;
             var loc = packets[value.state][value.direction];
 
@@ -100,7 +88,12 @@ var packetHandler = {
                     id: -1
                 }
             }
-            loc[output.new.id] = output;
+            if (value.new != undefined && value.new.id != -1) {
+                loc[value.new.id] = output;
+            } else {
+                loc[value.id + "o"] = output;
+            }
+
         }
         if (Object.keys(newJson).length > 0) {
             for (var newKey in newJson.changedPackets) {
@@ -141,8 +134,8 @@ var packetHandler = {
                 // Search
                 for (var packet2 in newP) {
                     if (this.isSame(oldP[packet1], newP[packet2]) && newP[packet2].newId == undefined) {
-                        oldP[packet1].newId = newP[packet2].id;
-                        newP[packet2].newId = oldP[packet1].id;
+                        oldP[packet1].newId = packet2;
+                        newP[packet2].newId = packet1;
                         continue loop1;
                     }
                 }
@@ -157,6 +150,8 @@ var packetHandler = {
                 loop2:
                     for (var packet2 in newP) {
                         if (newP[packet2].newId != undefined) continue loop2;
+                        if (newP[packet2].state != oldP[packet1].state) continue loop2;
+                        if (newP[packet2].direction != oldP[packet1].direction) continue loop2;
 
                         // Generate a score for this packet
                         var totalDiff = Math.abs(oldP[packet1]["instructions"].length - newP[packet2]["instructions"].length)
@@ -172,21 +167,25 @@ var packetHandler = {
 
                         if (weighted < score) {
                             score = weighted;
-                            highest = newP[packet2];
+                            highest = packet2;
                         }
                     }
                 // Don't allow it to match any packet (must have a score less than this)
                 var max = (4 * 5) + (2 * 3) + (1 * 2);
                 if (score < max) {
                     if (highest != undefined) {
-                        oldP[packet1].newId = highest.id;
-                        highest.newId = oldP[packet1].id;
+                        oldP[packet1].newId = highest;
+                        newP[highest].newId = packet1;
                     }
                 }
             }
     },
 
     isSame: function (packet1, packet2) {
+        if(packet1 == undefined || packet2 == undefined) return false;
+        if (packet1.direction != packet2.direction || packet1.state != packet2.state) {
+            return false;
+        }
         for (var instr in packet1["instructions"]) {
             if (!this.equalsInstruction(packet1["instructions"][instr], packet2["instructions"][instr])) {
                 return false;
