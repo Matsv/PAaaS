@@ -31,6 +31,9 @@ var packetHandler = {
     handle: function (oldJson, newJson) {
         var packets = {};
 
+        var oldPackets = {};
+        var newPackets = {};
+
         // Get all the states
         var states = oldJson.states;
         if (!equals(oldJson.states, newJson.states)) {
@@ -51,59 +54,83 @@ var packetHandler = {
         for (var sta in states) {
             if (states.hasOwnProperty(sta)) {
                 packets[states[sta]] = {};
+                oldPackets[states[sta]] = {};
+                newPackets[states[sta]] = {};
+
                 for (var dire in directions)
-                    if (directions.hasOwnProperty(dire))
-                        packets[states[sta]][directions[dire]] = {};
-            }
-        }
-
-        // Calculate the correct packets
-        this.reorder(oldJson.changedPackets, newJson.changedPackets);
-        // Compare both sides to not skip removed / added instructions
-        this.compare(oldJson.changedPackets, newJson.changedPackets);
-        this.compare(newJson.changedPackets, oldJson.changedPackets);
-
-        for (var key in oldJson.changedPackets) {
-            var value = oldJson.changedPackets[key];
-            if (value == undefined) continue;
-            var newId = value.newId;
-            var loc = packets[value.state][value.direction];
-
-            var output = {"old": value};
-
-            if (newId != undefined) {
-                // don't display if nothing has changed
-                output.new = newJson.changedPackets[newId];
-                delete newJson.changedPackets[newId];
-                if (this.isSame(output.new, value)) {
-                    if (output.new.id == value.id) {
-                        continue;
-                    } else {
-                        output.new["instructions"] = undefined;
-                        output.old["instructions"] = undefined;
+                    if (directions.hasOwnProperty(dire)) {
+                        packets[states[sta]][directions[dire]] = [];
+                        oldPackets[states[sta]][directions[dire]] = [];
+                        newPackets[states[sta]][directions[dire]] = [];
                     }
-                }
-            } else {
-                output.new = {
-                    id: -1
-                }
             }
-            if (output.new != undefined && output.new.id != -1) {
-                loc[output.new.id] = output;
-            } else {
-                loc[value.id + "-removed"] = output;
-            }
-
         }
-        if (Object.keys(newJson).length > 0) {
-            for (var newKey in newJson.changedPackets) {
-                var val = newJson.changedPackets[newKey];
-                packets[val.state][val.direction][val.id] = {
-                    old: {
-                        id: -1
-                    },
-                    new: val
-                };
+        // Sort packets into the direction & state
+        for (var p in oldJson.changedPackets) {
+            var val = oldJson.changedPackets[p];
+            oldPackets[val.state][val.direction][val.id] = val;
+        }
+        for (var p in newJson.changedPackets) {
+            var val = newJson.changedPackets[p];
+            newPackets[val.state][val.direction][val.id] = val;
+        }
+        // Calculate the correct packets
+
+
+        for (var sta in states) {
+            if (states.hasOwnProperty(sta)) {
+                for (var dire in directions)
+                    if (directions.hasOwnProperty(dire)) {
+                        // Reorder
+                        this.reorder(oldPackets[states[sta]][directions[dire]], newPackets[states[sta]][directions[dire]]);
+                        // Compare both sides to not skip removed / added instructions
+                        this.compare(oldPackets[states[sta]][directions[dire]], newPackets[states[sta]][directions[dire]]);
+                        this.compare(newPackets[states[sta]][directions[dire]], oldPackets[states[sta]][directions[dire]]);
+                        // Output
+                        for (var key in oldPackets[states[sta]][directions[dire]]) {
+                            var value = oldPackets[states[sta]][directions[dire]][key];
+                            if (value == undefined) continue;
+                            var newId = value.newId;
+                            var loc = packets[value.state][value.direction];
+
+                            var output = {"old": value};
+
+                            if (newId != undefined) {
+                                // don't display if nothing has changed
+                                output.new = newPackets[states[sta]][directions[dire]][newId];
+                                delete newPackets[states[sta]][directions[dire]][newId];
+                                if (this.isSame(output.new, value)) {
+                                    if (output.new.id == value.id) {
+                                        continue;
+                                    } else {
+                                        output.new["instructions"] = undefined;
+                                        output.old["instructions"] = undefined;
+                                    }
+                                }
+                            } else {
+                                output.new = {
+                                    id: -1
+                                }
+                            }
+                            if (output.new != undefined && output.new.id != -1) {
+                                loc[output.new.id] = output;
+                            } else {
+                                loc[value.id + "-removed"] = output;
+                            }
+
+                        }
+                        if (Object.keys(newPackets[states[sta]][directions[dire]]).length > 0) {
+                            for (var newKey in newPackets[states[sta]][directions[dire]]) {
+                                var val = newPackets[states[sta]][directions[dire]][newKey];
+                                packets[val.state][val.direction][val.id] = {
+                                    old: {
+                                        id: -1
+                                    },
+                                    new: val
+                                };
+                            }
+                        }
+                    }
             }
         }
         return packets;
@@ -125,60 +152,30 @@ var packetHandler = {
 
     // Reorder the packets so that they match up
     reorder: function (oldP, newP) {
-        // First iteration matches identical packets
-        loop1:
-            for (var packet1 in oldP) {
-                if (oldP[packet1].newId != undefined) {
-                    continue loop1;
-                }
-                // Search
-                for (var packet2 in newP) {
-                    if (this.isSame(oldP[packet1], newP[packet2]) && newP[packet2].newId == undefined) {
-                        oldP[packet1].newId = packet2;
-                        newP[packet2].newId = packet1;
-                        continue loop1;
-                    }
+        // Basic algorithm:
+        var currentShift = 0;
+        for (var packet1 in oldP) {
+            if (oldP[packet1].newId != undefined) {
+                continue;
+            }
+
+            // We just want to check if the packet with the id + shift is the same
+            var id = parseInt(packet1) + currentShift;
+            if (this.isSame(oldP[packet1], newP[id])) {
+                oldP[packet1].newId = id;
+                newP[id].newId = packet1;
+                continue;
+            } else {
+                // Check if it's now the next packet
+                id++;
+                if (this.isSame(oldP[packet1], newP[id])) {
+                    // Must be a new packet so increment shift
+                    currentShift++;
+                    oldP[packet1].newId = id;
+                    newP[id].newId = packet1;
                 }
             }
-        // Second iteration (attempts to find closest match)
-        loop1:
-            for (var packet1 in oldP) {
-                if (oldP[packet1].newId != undefined) continue loop1;
-                // Search
-                var highest = undefined;
-                var score = Number.MAX_VALUE;
-                loop2:
-                    for (var packet2 in newP) {
-                        if (newP[packet2].newId != undefined) continue loop2;
-                        if (newP[packet2].state != oldP[packet1].state) continue loop2;
-                        if (newP[packet2].direction != oldP[packet1].direction) continue loop2;
-
-                        // Generate a score for this packet
-                        var totalDiff = Math.abs(oldP[packet1]["instructions"].length - newP[packet2]["instructions"].length)
-                        var instrDiff = 0;
-                        for (var instr in oldP[packet1]["instructions"]) {
-                            if (!this.equalsInstruction(oldP[packet1]["instructions"][instr], newP[packet2]["instructions"][instr])) {
-                                instrDiff++;
-                            }
-                        }
-                        var idDiff = Math.abs(oldP[packet1].id - newP[packet2].id);
-
-                        var weighted = (4 * idDiff) + (2 * instrDiff) * (1 * totalDiff)
-
-                        if (weighted < score) {
-                            score = weighted;
-                            highest = packet2;
-                        }
-                    }
-                // Don't allow it to match any packet (must have a score less than this)
-                var max = (4 * 5) + (2 * 3) + (1 * 2);
-                if (score < max) {
-                    if (highest != undefined) {
-                        oldP[packet1].newId = highest;
-                        newP[highest].newId = packet1;
-                    }
-                }
-            }
+        }
     },
 
     isSame: function (packet1, packet2) {
