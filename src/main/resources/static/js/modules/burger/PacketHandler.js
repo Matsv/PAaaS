@@ -88,10 +88,10 @@ var packetHandler = {
                     id: -1
                 }
             }
-            if (value.new != undefined && value.new.id != -1) {
-                loc[value.new.id] = output;
+            if (output.new != undefined && output.new.id != -1) {
+                loc[output.new.id] = output;
             } else {
-                loc[value.id + "o"] = output;
+                loc[value.id + "-removed"] = output;
             }
 
         }
@@ -182,7 +182,7 @@ var packetHandler = {
     },
 
     isSame: function (packet1, packet2) {
-        if(packet1 == undefined || packet2 == undefined) return false;
+        if (packet1 == undefined || packet2 == undefined) return false;
         if (packet1.direction != packet2.direction || packet1.state != packet2.state) {
             return false;
         }
