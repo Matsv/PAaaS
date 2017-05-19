@@ -12,7 +12,6 @@ package nl.matsv.paaas.module.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.data.VersionMeta;
 import nl.matsv.paaas.storage.StorageManager;
@@ -23,6 +22,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,33 +47,50 @@ public class SoundModule extends AbstractClassModule {
         // Load classes
         loadClasses(storageManager, versionDataFile);
         // Find sound file
-        String soundClass = findClassFromConstant("Accessed Sounds before Bootstrap!");
-        ClassNode node = classes.get(soundClass);
+        String soundClass = findClassFromConstant("ambient.cave", "block.anvil.break", "-Accessed Sounds before Bootstrap!");
+        if (soundClass == null) {
+            // Fallback
+            System.out.println("Sounds may be slightly incorrect as falling back!");
+            soundClass = findClassFromConstant("Accessed Sounds before Bootstrap!");
+        }
+        if (soundClass != null) {
+            System.out.println("Sound Class: " + soundClass);
+        } else {
+            System.out.println("Could not find sound class :(");
+            return;
+        }
+        String finalSoundClass = soundClass;
+        ClassNode node = classes.get(finalSoundClass);
+
         List<String> sounds = new ArrayList<>();
         for (MethodNode method : (List<MethodNode>) node.methods) {
-            if (method.name.equals("<clinit>")) {
-                method.accept(new MethodVisitor(Opcodes.ASM5) {
-                    private Object ldc;
+            if (method.name.equals("<clinit>") || (method.access & (Modifier.STATIC | Modifier.PUBLIC)) == (method.access & (Modifier.STATIC | Modifier.PUBLIC))) {
+                // If it doesn't look like we have the right sound method :P
+                if (sounds.size() < 10) {
+                    sounds.clear();
+                    method.accept(new MethodVisitor(Opcodes.ASM5) {
+                        private Object ldc;
 
-                    @Override
-                    public void visitLdcInsn(Object cst) {
-                        ldc = cst;
-                    }
+                        @Override
+                        public void visitLdcInsn(Object cst) {
+                            ldc = cst;
+                        }
 
-                    @Override
-                    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-                        if (opcode == Opcodes.INVOKESTATIC && ldc instanceof String && owner.equals(soundClass)) {
-                            Type[] args = Type.getArgumentTypes(desc);
-                            if (args.length == 1) {
-                                if (args[0].getClassName().equals("java.lang.String")) {
-                                    sounds.add((String) ldc);
+                        @Override
+                        public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+                            if (opcode == Opcodes.INVOKESTATIC && ldc instanceof String && owner.equals(finalSoundClass)) {
+                                Type[] args = Type.getArgumentTypes(desc);
+                                if (args.length == 1) {
+                                    if (args[0].getClassName().equals("java.lang.String")) {
+                                        sounds.add((String) ldc);
+                                    }
                                 }
                             }
+                            ldc = null;
+                            super.visitMethodInsn(opcode, owner, name, desc, itf);
                         }
-                        ldc = null;
-                        super.visitMethodInsn(opcode, owner, name, desc, itf);
-                    }
-                });
+                    });
+                }
             }
         }
         versionDataFile.setSounds(sounds);

@@ -89,17 +89,19 @@ var burgerModule = {
     },
     generateInstructions: function (packet, title, style, name) {
         var data = {};
-        if (packet.id === -1) {
+        if (packet == undefined || packet.id === -1) {
             data.title = "<strong>{0}</strong>".format(title);
             data.body = "";
         } else {
             data.title = this.getPacketTitle(packet, name);
+            data.body = undefined;
+            if (packet.instructions != undefined) {
+                var table = web.createElement("table", "instructionTable", "");
+                var tBody = web.createElement("tbody", "packetBody", "", table);
 
-            var table = web.createElement("table", "instructionTable", "");
-            var tBody = web.createElement("tbody", "packetBody", "", table);
-
-            new packetParser(tBody, style).parsePackets(packet.instructions);
-            data.body = table;
+                new packetParser(tBody, style).parsePackets(packet.instructions);
+                data.body = table;
+            }
         }
         return data;
     },

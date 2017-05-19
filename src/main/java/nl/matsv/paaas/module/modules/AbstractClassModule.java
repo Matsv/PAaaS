@@ -60,6 +60,7 @@ public abstract class AbstractClassModule extends Module {
     }
 
     public String findClassFromConstant(String... str) {
+        mainLoop:
         for (Map.Entry<String, ClassNode> s : classes.entrySet()) {
             List<String> toFind = new ArrayList<>(Arrays.asList(str));
             ClassNode clazz = s.getValue();
@@ -70,11 +71,25 @@ public abstract class AbstractClassModule extends Module {
                         LdcInsnNode ldc = (LdcInsnNode) insnNode;
                         if (toFind.contains(ldc.cst)) {
                             toFind.remove(ldc.cst);
-                            if (toFind.size() == 0)
+                            if (toFind.size() == 0) {
                                 return s.getKey();
+                            }
+                        } else {
+                            if (toFind.contains("-" + ldc.cst)) {
+                                continue mainLoop;
+                            }
                         }
                     }
                 }
+            }
+            // Check if any negations
+            for (String st : str) {
+                if (st.startsWith("-")) {
+                    toFind.remove(st);
+                }
+            }
+            if (toFind.size() == 0) {
+                return s.getKey();
             }
         }
         return null;

@@ -94,10 +94,7 @@ public class BurgerModule extends Module {
 
         Map<String, BurgerPacket> changedPackets = new HashMap<>();
 
-        BurgerPackets otherPackets = other.getBurgerData().getPackets();
         bout.getPackets().getPacket().entrySet().stream()
-                .filter(entry ->
-                        !(otherPackets.getPacket().containsKey(entry.getKey()) && otherPackets.getPacket().get(entry.getKey()).equals(entry.getValue())))
                 .forEach(entry -> changedPackets.put(entry.getKey(), entry.getValue()));
 
         output.add("changedPackets", gson.toJsonTree(changedPackets));

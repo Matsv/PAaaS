@@ -10,8 +10,22 @@
 
 var metadataModule = {
     onCompare: function (oldV, newV) {
-        web.createDifferenceBox("<strong>Metadata</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata</strong>", "<div id=\"newTree\"></div>"); // Todo
+        web.createDifferenceBox("<strong>Metadata " + this.stats(oldV) + "</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata " + this.stats(newV) + "</strong>", "<div id=\"newTree\"></div>"); // Todo
         this.generateTree(oldV, newV);
+    },
+    stats: function(ver) {
+        var stats = this.resolveStats(ver);
+        return "(" + stats[0] + " entities, " + stats[1] + " metadata entries)";
+    },
+    resolveStats: function(tree) {
+        var metadata = tree.metadata.length;
+        var entity = tree.children.length;
+        for (var i in tree.children) {
+            var resolved = this.resolveStats(tree.children[i]);
+            entity += resolved[0];
+            metadata += resolved[1];
+        }
+        return [entity, metadata];
     },
     generateTree: function (oldV, newV) {
         var oldTree = oldV;
