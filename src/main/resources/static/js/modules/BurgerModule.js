@@ -25,12 +25,25 @@ var burgerModule = {
             for (var boundKey in packets[stateKey]) {
                 var boundDiv = this.addBound(boundKey, stateKey, stateDiv);
                 var added = 0;
-                for (var packet in packets[stateKey][boundKey]) {
-                    var packetObj = packets[stateKey][boundKey][packet];
-                    this.addPacket(packetObj, boundDiv, this.getPacketName(oldV.wiki_data, packetObj.old), this.getPacketName(newV.wiki_data, packetObj.new));
-                    added++;
-                }
+                var module = this;
+                Object.keys(packets[stateKey][boundKey])
+                    .sort(function (text1, text2) {
+                        var a = parseInt(text1.match(/\d+/g)[0]);
+                        var b = parseInt(text2.match(/\d+/g)[0]);
 
+                        if (a > b) {
+                            return 1;
+                        }
+                        if (a < b) {
+                            return -1;
+                        }
+                        return text1.localeCompare(text2);
+                    })
+                    .forEach(function (v, i) {
+                        var packetObj = packets[stateKey][boundKey][v];
+                        module.addPacket(packetObj, boundDiv, module.getPacketName(oldV.wiki_data, packetObj.old), module.getPacketName(newV.wiki_data, packetObj.new));
+                        added++;
+                    });
                 if (added == 0) {
                     web.createElement("p", "nochange", "No changes detected", boundDiv)
                 }

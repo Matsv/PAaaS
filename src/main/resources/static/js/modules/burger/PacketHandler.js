@@ -114,9 +114,9 @@ var packetHandler = {
                             }
 
                             if (output.new != undefined && output.new.id != -1) {
-                                loc[output.new.id] = output;
+                                loc[output.new.id + "a"] = output;
                             } else {
-                                loc[value.id + "-removed"] = output;
+                                loc[value.id + "b"] = output;
                             }
 
                         }
@@ -174,6 +174,8 @@ var packetHandler = {
                     currentShift++;
                     oldP[packet1].newId = id;
                     newP[id].newId = packet1;
+                } else {
+                    currentShift--; // Packet removed
                 }
             }
         }
