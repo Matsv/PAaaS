@@ -17,7 +17,6 @@ import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.data.VersionMeta;
 import nl.matsv.paaas.data.burger.BurgerOutput;
 import nl.matsv.paaas.data.burger.BurgerPacket;
-import nl.matsv.paaas.data.burger.BurgerPackets;
 import nl.matsv.paaas.data.wiki.WikiData;
 import nl.matsv.paaas.module.Module;
 import nl.matsv.paaas.services.BurgerService;

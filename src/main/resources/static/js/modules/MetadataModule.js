@@ -13,11 +13,11 @@ var metadataModule = {
         web.createDifferenceBox("<strong>Metadata " + this.stats(oldV) + "</strong>", "<div id=\"oldTree\"></div>", "<strong>Metadata " + this.stats(newV) + "</strong>", "<div id=\"newTree\"></div>"); // Todo
         this.generateTree(oldV, newV);
     },
-    stats: function(ver) {
+    stats: function (ver) {
         var stats = this.resolveStats(ver);
         return "(" + stats[0] + " entities, " + stats[1] + " metadata entries)";
     },
-    resolveStats: function(tree) {
+    resolveStats: function (tree) {
         var metadata = tree.metadata.length;
         var entity = tree.children.length;
         for (var i in tree.children) {
