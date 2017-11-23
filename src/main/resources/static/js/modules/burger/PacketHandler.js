@@ -200,7 +200,6 @@ var packetHandler = {
             }
         }
         return true;
-        // return packet1.id == packet2.id;
     },
 
     // Do all the magic to check if the instructions are equal
@@ -210,7 +209,7 @@ var packetHandler = {
 
         if (o1.operation != undefined ? o1.operation !== o2.operation : o2.operation != undefined) return false;
         if (o1.type != undefined ? o1.type !== o2.type : o2.type != undefined) return false;
-        if (o1.var != undefined ? o1.var !== o2.var : o2.var != undefined) return false;
+        // if (o1.var != undefined ? o1.var !== o2.var : o2.var != undefined) return false;
         if (o1.amount != undefined ? o1.amount !== o2.amount : o2.amount != undefined) return false;
         return o1.instructions != undefined ? this.equalsInstruction(o1.instructions, o2.instructions) : o2.instructions == null;
     }

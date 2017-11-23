@@ -31,6 +31,7 @@ var dataTypes = {
         this.data["metadata"] = "writeMetadata";
         this.data["uuid"] = "writeUUID";
         this.data["nbtcompound"] = "writeNBT";
+        this.data["identifier"] = "writeIdentifier";
     },
     contains: function (name) {
         var contains = name in this.data;
@@ -120,6 +121,9 @@ var packetParser = function (tbody, style) {
                 break;
             case "break":
                 this.addLine(level, "break;");
+                break;
+            case "interfacecall":
+                this.addLine(level, "// Call to {0} (Interface)", [instruction.field]);
                 break;
             default:
                 this.addLine(level, "// {0}", [instruction]);
