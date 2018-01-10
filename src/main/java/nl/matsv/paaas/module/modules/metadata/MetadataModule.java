@@ -12,7 +12,6 @@ package nl.matsv.paaas.module.modules.metadata;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import nl.matsv.paaas.data.VersionDataFile;
 import nl.matsv.paaas.data.VersionMeta;
 import nl.matsv.paaas.data.metadata.MetadataEntry;
@@ -45,7 +44,7 @@ public class MetadataModule extends AbstractClassModule {
         if (versionDataFile.getVersion().getReleaseTime().getTime() < 1292976000000L) {
             VersionMeta meta = versionDataFile.getMetadata();
 
-            meta.setEnabled(false);
+//            meta.setEnabled(false);
             meta.addError("This version is too old to Metadata.");
 
             System.out.println("Skip " + versionDataFile.getVersion().getId() + " for metadata because it's too old");
@@ -74,7 +73,7 @@ public class MetadataModule extends AbstractClassModule {
         if (entity == null || entityTypes == null || dataWatcher == null) {
             VersionMeta meta = versionDataFile.getMetadata();
 
-            meta.setEnabled(false);
+//            meta.setEnabled(false);
             meta.addError("Metadata: Could not find constants, found " +
                     "Entity: " + entity + " Types: " + entityTypes + " Data Watcher: " + dataWatcher);
 
