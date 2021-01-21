@@ -71,7 +71,8 @@ public class WikiExtractor {
                 if (i == 0)
                     continue;
                 if (i == 1)
-                    pid = Integer.parseInt(td.text());
+                    // Replace and trim the string as there will be an numberformatexception when parsing "Snapshot 11" example
+                    pid = Integer.parseInt(td.text().replaceAll("Snapshot", "").trim());
                 else {
                     Optional<Element> opa = Optional.ofNullable(td.select("a").first());
                     if (!opa.isPresent()) {
@@ -121,16 +122,20 @@ public class WikiExtractor {
             Element tr = trs.get(1);
             Elements tds = tr.select("td");
 
-            String packetName = findPacketName(el);
-            int id = Integer.parseInt(tds.get(0).text().substring(2), 16); // Remove 0x
-            String state = tds.get(1).text().toLowerCase();
-            String bounding = tds.get(2).text().toLowerCase() + "bound";
+            try {
+                String packetName = findPacketName(el);
+                int id = Integer.parseInt(tds.get(0).text().substring(2), 16); // Remove 0x
+                String state = tds.get(1).text().toLowerCase();
+                String bounding = tds.get(2).text().toLowerCase() + "bound";
 
-            if (!dataMap.containsKey(state))
-                dataMap.put(state, Maps.newTreeMap());
-            if (!dataMap.get(state).containsKey(bounding))
-                dataMap.get(state).put(bounding, Maps.newTreeMap());
-            dataMap.get(state).get(bounding).put(id, packetName);
+                if (!dataMap.containsKey(state))
+                    dataMap.put(state, Maps.newTreeMap());
+                if (!dataMap.get(state).containsKey(bounding))
+                    dataMap.get(state).put(bounding, Maps.newTreeMap());
+                dataMap.get(state).get(bounding).put(id, packetName);
+            } catch (Exception ignored) {
+                // Ignore the "No packet name found for " exception, as this one is present in all versions because of the plugin channel documentation
+            }
         }
 
         return dataMap;
